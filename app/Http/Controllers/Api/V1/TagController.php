@@ -60,18 +60,26 @@ class TagController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $id): TagResource
-    {
-        return new TagResource($this->tagRepository->getById($id));
-    }
+ public function show(int $id): \Illuminate\Http\JsonResponse
+ {
+     $tag = $this->tagRepository->getById($id);
+     if (!$tag) {
+         return response()->json([
+             'success' => false,
+             'message' => 'Tag not found'
+         ], 404);
+     }
+     return response()->json(new TagResource($tag), 200);
+ }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(TagRequest $request, int $id): \Illuminate\Http\JsonResponse
     {
+        $data = $request->validated();
         try {
-            $this->tagRepository->update($id, $request->validated());
+            $this->tagRepository->update($id, $data);
             return response()->json([
                 'success' => true,
                 'message' => "Tag updated successfully"

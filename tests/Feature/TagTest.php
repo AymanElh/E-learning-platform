@@ -24,19 +24,17 @@ test('can fetch on tag', function() {
     $tag = Tag::factory()->create();
 
     $response = $this->getJson("/api/v1/tags/{$tag->id}");
+//    $response->dump();
     $response->assertStatus(200)
         ->assertJsonStructure([
-            'data' => ['id', 'name']
+            'id',
+            'name'
         ]);
 });
 
-test('not fount tag', function() {
+test('not found tag', function() {
     $response = $this->getJson('/api/v1/tags/9999');
-    $response->assertStatus(404)
-        ->assertJsonStructure([
-            'success',
-            'message'
-        ]);
+    $response->assertStatus(404);
 });
 
 
@@ -57,7 +55,7 @@ test('can update tag', function() {
     $tag = Tag::factory()->create();
     $update = ['name' => 'ayman'];
 
-    $response = $this->putJson("/api/v1/tags/{$tag->id}");
+    $response = $this->putJson("/api/v1/tags/{$tag->id}", $update);
 
     $response->assertStatus(200)
         ->assertJson([

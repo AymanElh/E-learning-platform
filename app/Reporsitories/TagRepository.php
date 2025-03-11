@@ -32,8 +32,7 @@ class TagRepository implements TagRepositoryInterface
 
     public function update(int $id, array $data)
     {
-        $tag = Tag::findOrFail($id);
-        return $tag->update($data);
+        return Tag::where('id', $id)->update($data);
     }
 
     public function delete(int $id)
