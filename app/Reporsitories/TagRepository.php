@@ -15,7 +15,7 @@ class TagRepository implements TagRepositoryInterface
         //
     }
 
-    public function index()
+    public function index(): \Illuminate\Database\Eloquent\Collection
     {
         return Tag::all();
     }
@@ -32,7 +32,8 @@ class TagRepository implements TagRepositoryInterface
 
     public function update(int $id, array $data)
     {
-        return Tag::whereId($id)->update($data);
+        $tag = Tag::findOrFail($id);
+        return $tag->update($data);
     }
 
     public function delete(int $id)
