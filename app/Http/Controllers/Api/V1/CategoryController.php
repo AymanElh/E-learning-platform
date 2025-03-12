@@ -32,6 +32,7 @@ class CategoryController extends Controller
     {
         try {
             $data = $request->validated();
+            \Log::info('Validated data: ', $data);
             $this->categoryRepository->store($data);
 
             return response()->json([

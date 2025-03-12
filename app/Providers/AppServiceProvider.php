@@ -9,6 +9,13 @@ use App\Repositories\TagRepository;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
+
+/**
+ * @OA\Info(
+ *     title="E-Learning",
+ *     version="1.0.0"
+ * )
+ */
 class AppServiceProvider extends ServiceProvider
 {
     /**
