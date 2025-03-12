@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Interfaces\CategoryRepositoryInterface;
+use App\Interfaces\CourseRepositoryInterface;
 use App\Interfaces\TagRepositoryInterface;
 use App\Repositories\CategoryRepository;
+use App\Repositories\CourseRepository;
 use App\Repositories\TagRepository;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -25,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(TagRepositoryInterface::class, TagRepository::class);
         $this->app->bind(CategoryRepositoryInterface::class, CategoryRepository::class);
+        $this->app->bind(CourseRepositoryInterface::class, CourseRepository::class);
     }
 
     /**

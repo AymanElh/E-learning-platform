@@ -20,7 +20,7 @@ class CategoryRepository implements CategoryRepositoryInterface
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function index()
+    public function index(): \Illuminate\Database\Eloquent\Collection
     {
         return Category::all();
     }
@@ -31,7 +31,7 @@ class CategoryRepository implements CategoryRepositoryInterface
      * @param int $id
      * @return \App\Models\Category
      */
-    public function getById(int $id)
+    public function getById(int $id): Category
     {
         return Category::findOrFail($id);
     }

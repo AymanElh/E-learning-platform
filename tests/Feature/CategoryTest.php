@@ -28,8 +28,8 @@ test('can fetch one category', function() {
         ->assertJsonStructure([
             'id',
             'name',
-//            'description',
-//            'category_id'
+            'description',
+            'category_id'
         ]);
 });
 
