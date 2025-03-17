@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TagRequest extends FormRequest
+class LoginRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,13 @@ class TagRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required'
+            'email' => ['required', 'email'],
+            'password' => ['required']
         ];
+    }
+
+    public function credentials() : array
+    {
+        return $this->only('email', 'password');
     }
 }

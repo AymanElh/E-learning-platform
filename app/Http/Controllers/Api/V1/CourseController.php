@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CourseRequest;
-use App\Http\Requests\CourseTagsRequest;
+use App\Http\Requests\V1\CourseRequest;
+use App\Http\Requests\V1\CourseTagsRequest;
 use App\Http\Resources\V1\CourseCollection;
 use App\Http\Resources\V1\CourseResource;
 use App\Repositories\CourseRepository;
