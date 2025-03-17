@@ -21,6 +21,6 @@ Route::prefix('v1')->group(function() {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
-
+    Route::post('/profile-picture', [AuthController::class, 'uploadProfilePicture']);
 });
 

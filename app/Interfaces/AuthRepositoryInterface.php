@@ -9,4 +9,5 @@ interface AuthRepositoryInterface
     public function refreshToken();
     public function logout();
     public function getAuthenticatedUser();
+    public function uploadProfilePicture($file, $user);
 }

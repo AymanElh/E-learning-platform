@@ -8,6 +8,7 @@ use App\Http\Requests\V1\RegisterRequest;
 use App\Models\User;
 use App\Repositories\AuthRepository;
 use Auth;
+use Illuminate\Http\Request;
 use Mockery\Exception;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -109,5 +110,26 @@ class AuthController extends Controller
     public function profile()
     {
         return response()->json(['user' => auth()->user()]);
+    }
+
+    public function uploadProfilePicture(Request $request)
+    {
+        $user = $this->authRepository->getAuthenticatedUser();
+        if(!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => "Unauthorized"
+            ], 401);
+        }
+
+        $updatedUser = $this->authRepository->uploadProfilePicture($request->file('profile_picture'), $user);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Profile Picture updated successfully",
+            'data' => [
+                'user' => $updatedUser
+            ]
+        ]);
     }
 }

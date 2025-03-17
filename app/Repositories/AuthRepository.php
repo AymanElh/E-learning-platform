@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Interfaces\AuthRepositoryInterface;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 use Mockery\Exception;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -11,11 +12,18 @@ class AuthRepository implements AuthRepositoryInterface
 {
     public function register(array $data)
     {
-        return User::create([
+        $userData = [
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => $data['password']
-        ]);
+        ];
+
+        if($data['profile_picture']) {
+            $path = $data['profile_picture']->store('profile_pictures', 'public');
+            $userData['profile_picture'] = $path;
+        }
+
+        return User::create($userData);
     }
 
     public function login(array $credentials)
@@ -51,4 +59,14 @@ class AuthRepository implements AuthRepositoryInterface
         }
     }
 
+    public function uploadProfilePicture($file, $user)
+    {
+        if($user->profile_picture) {
+            Storage::disk('public')->delete($user->profile_picture);
+        }
+        $path = $file->store('images', 'public');
+        $user->update(['profile_picture', $path]);
+
+        return $user;
+    }
 }
