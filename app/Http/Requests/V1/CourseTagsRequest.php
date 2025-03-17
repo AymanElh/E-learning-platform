@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CourseRequest extends FormRequest
+class CourseTagsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,13 +22,7 @@ class CourseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'duration' => 'required|integer|min:1',
-            'difficulty' => 'required|in:beginner,intermediate,advanced',
-            'status' => 'nullable|in:open,in_progress,completed',
-            'category_id' => 'required|exists:categories,id',
-            'tags' => 'nullable|array',
+            'tags' => 'required|array|min:1',
             'tags.*' => 'exists:tags,id',
         ];
     }
