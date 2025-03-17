@@ -6,53 +6,93 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\LoginRequest;
 use App\Http\Requests\V1\RegisterRequest;
 use App\Models\User;
+use App\Repositories\AuthRepository;
 use Auth;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rules\Password;
+use Mockery\Exception;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
+    protected AuthRepository $authRepository;
+
+    /**
+     * @param AuthRepository $authRepository
+     */
+    public function __construct(AuthRepository $authRepository)
+    {
+        $this->authRepository = $authRepository;
+    }
+
     public function register(RegisterRequest $request)
     {
-        $validatedData = $request->validated();
-//        return response()->json([
-//            'data' => $validatedData,
-//        ]);
         try {
-
-            $user = User::create($validatedData);
-//            $token = JWTAuth::fromUser($user);
-            \Log::info("Registration user with ID: " . $user->id);
-
-            return response()->json([
-                'success' => true,
-                'message' => "User registered successfully",
-                'user' => $user,
-            ], 201);
-        } catch (\Exception $e) {
-            \Log::error("Error during user registration: " . $e->getMessage());
+            $user = $this->authRepository->register($request->validated());
+            if(!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Registration failed"
+                ], 500);
+            }
+            $token = $this->authRepository->login([
+                'email' => $request->email,
+                'password' => $request->password
+            ]);
+            return $this->createNewToken($token);
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => "Registration failed: " . $e->getMessage()
-            ], 400);
+                'message' => "Registration failed"
+            ], 500);
         }
     }
 
     public function login(LoginRequest $request)
     {
-        $credentials = $request->credentials();
+        $token = $this->authRepository->login($request->all());
+        if(!$token) {
+            return response()->json([
+                'success' => false,
+                'message' => "Login Failed"
+            ], 401);
+        }
+        return $this->createNewToken($token);
+    }
+
+    public function user()
+    {
+        $user = $this->authRepository->getAuthenticatedUser();
+        return response()->json([
+            'success' => true,
+            'data' => $user
+        ]);
+    }
+
+    public function logout()
+    {
+        $success = $this->authRepository->logout();
+        if(!$success) {
+            return response()->json([
+                'success' => false,
+                'message' => "Failed to logout"
+            ], 500);
+        }
+        return response()->json([
+            'success' => true,
+            'message' => "Logout successfully"
+        ]);
+    }
+
+    public function refresh()
+    {
         try {
-            if (! $token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'Invalid credentials'], 401);
-            }
-
-            $user = auth()->user();
-
+            $token = $this->authRepository->refreshToken();
             return $this->createNewToken($token);
-        } catch (JWTException $e) {
-            return response()->json(['error' => 'Could not create token'], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to refresh token'
+            ], 401);
         }
     }
 
@@ -64,6 +104,7 @@ class AuthController extends Controller
             'expires_in' => auth()->factory()->getTTL() * 60
         ]);
     }
+
 
     public function profile()
     {
