@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CourseController;
+use App\Http\Controllers\Api\V1\EnrollmentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\TagController;
 use App\Http\Controllers\Api\V1\CategoryController;
@@ -22,5 +23,12 @@ Route::prefix('v1')->group(function() {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
     Route::post('/profile-picture', [AuthController::class, 'uploadProfilePicture']);
+
+    // Enrollments
+    Route::post('/courses/{course}/enroll', [EnrollmentController::class, 'enroll']);
+    Route::get('/courses/{course}/enrollments', [EnrollmentController::class, 'getEnrollmentsByCourse']);
+    Route::put('/enrollments/{enrollment}', [EnrollmentController::class, 'updateStatus']);
+    Route::get('/enrollments/me', [EnrollmentController::class, 'myEnrollments']);
+    Route::delete('/enrollments/{enrollment}', [EnrollmentController::class, 'destroy']);
 });
 
