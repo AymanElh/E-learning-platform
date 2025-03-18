@@ -10,7 +10,8 @@ test('user can register', function () {
         'name' => "test user",
         'email' => "test@example.com",
         'password' => "12345678",
-        'password_confirmation' => "12345678"
+        'password_confirmation' => "12345678",
+        'profile_picture' => null
     ]);
 
     $response->assertStatus(200)
