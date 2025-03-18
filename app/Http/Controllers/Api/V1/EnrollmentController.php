@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\V1\EnrollmentCollection;
+use App\Http\Resources\V1\EnrollmentResource;
 use App\Interfaces\EnrollmentRepositoryInterface;
 use Illuminate\Http\Request;
 
@@ -31,16 +33,18 @@ class EnrollmentController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "Course enrolled successfully"
+            'message' => "Course enrolled successfully",
+            'data' => new EnrollmentResource($enrollment->load(['user', 'course']))
         ], 201);
     }
 
     public function getEnrollmentsByCourse(Request $request, int $courseId)
     {
+        $enrollments = $this->enrollmentRepository->getEnrollmentByCourse($courseId);
         return response()->json([
             'success' => true,
             'message' => "Courses retrieved successfully",
-            'data' => $this->enrollmentRepository->getEnrollmentByCourse($courseId)
+            'data' => new EnrollmentCollection($enrollments)
         ]);
     }
 
@@ -59,7 +63,7 @@ class EnrollmentController extends Controller
         return response()->json([
            'success' => true,
            'message' => "Status updated successfully",
-            'data' => $enrollment
+            'data' => new EnrollmentResource($enrollment->load(['user', 'course']))
         ], 200);
     }
 
@@ -68,7 +72,7 @@ class EnrollmentController extends Controller
         $enrollments = $this->enrollmentRepository->getEnrollmentByUser(auth()->id());
         return response()->json([
             'success' => true,
-            'data' => $enrollments
+            'data' => new EnrollmentCollection($enrollments)
         ]);
     }
 
