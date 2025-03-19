@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\CourseController;
 use App\Http\Controllers\Api\V1\EnrollmentController;
 use App\Http\Controllers\Api\V1\PermissionController;
 use App\Http\Controllers\Api\V1\StatisticsController;
+use App\Http\Controllers\Api\V1\VideoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\TagController;
 use App\Http\Controllers\Api\V1\CategoryController;
@@ -42,6 +43,8 @@ Route::prefix('v1')->group(function() {
 
     Route::apiResource('/permissions', PermissionController::class);
 
+    // Course videos
+    Route::post('/courses/{course}/videos', [VideoController::class, 'store']);
     // stats
     Route::prefix('stats')->group(function() {
         Route::get('/categories', [StatisticsController::class, 'getCategoryStats']);

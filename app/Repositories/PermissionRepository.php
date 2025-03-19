@@ -70,7 +70,7 @@ class PermissionRepository implements PermissionRepositoryInterface
      * @param int $id
      * @return bool
      */
-    public function deletePermission(int $id)
+    public function deletePermission(int $id): bool
     {
         $permission = Permission::find($id);
 
