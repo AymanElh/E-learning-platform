@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CourseController;
 use App\Http\Controllers\Api\V1\EnrollmentController;
 use App\Http\Controllers\Api\V1\PermissionController;
+use App\Http\Controllers\Api\V1\StatisticsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\TagController;
 use App\Http\Controllers\Api\V1\CategoryController;
@@ -40,6 +41,13 @@ Route::prefix('v1')->group(function() {
     Route::delete('/roles/{role}/permissions', [RoleController::class, 'removePermissions']);
 
     Route::apiResource('/permissions', PermissionController::class);
+
+    // stats
+    Route::prefix('stats')->group(function() {
+        Route::get('/categories', [StatisticsController::class, 'getCategoryStats']);
+        Route::get('/tags', [StatisticsController::class, 'getTagStats']);
+        Route::get('/courses', [StatisticsController::class, 'getCourseStats']);
+    });
 
 });
 
