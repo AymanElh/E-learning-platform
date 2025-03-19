@@ -28,12 +28,25 @@ class PermissionController extends Controller
 
     public function index()
     {
-        $permissions = $this->permissionRepository->getAllPermissions();
-
-        return response()->json([
-            'success' => true,
-            'data' => $permissions
-        ]);
+        try {
+            $permissions = $this->permissionRepository->getAllPermissions();
+            if (!$permissions) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No permissions found'
+                ], 404);
+            }
+            return response()->json([
+                'success' => true,
+                'data' => $permissions
+            ]);
+        } catch (Exception $e) {
+            \Log::error("Error fetching permissions: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => "Error fetching permissions",
+            ]);
+        }
     }
 
     public function store(PermissionRequest $request)
