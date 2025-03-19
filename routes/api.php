@@ -44,7 +44,11 @@ Route::prefix('v1')->group(function() {
     Route::apiResource('/permissions', PermissionController::class);
 
     // Course videos
+    Route::get('/courses/{course}/videos', [VideoController::class, 'index']);
     Route::post('/courses/{course}/videos', [VideoController::class, 'store']);
+    Route::put('/videos/{video}', [VideoController::class, 'update']);
+    Route::delete('/videos/{video}', [VideoController::class, 'destroy']);
+
     // stats
     Route::prefix('stats')->group(function() {
         Route::get('/categories', [StatisticsController::class, 'getCategoryStats']);

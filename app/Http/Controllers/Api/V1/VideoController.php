@@ -71,24 +71,43 @@ class VideoController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => "Video not found"
-                ]);
+                ], 404);
             }
             return response()->json([
                 'success' => true,
                 'data' => $video
-            ]);
+            ], 200);
         } catch (Exception $e) {
             \Log::error("Error fetching the video: " . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => "Error fetching the video"
-            ]);
+            ], 500);
         }
     }
 
     public function update(VideoRequest $request, $id)
     {
-        // TODO: Implement update() method.
+        try {
+            $video = $this->videoRepository->update($id, $request->except('video'), $request->file('video'));
+            if(!$video) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Video not found"
+                ], 404);
+            }
+            return response()->json([
+                'success' => true,
+                'message' => "Video updated successfully",
+                'data' => $video
+            ]);
+        } catch (Exception $e) {
+            \Log::error("Error updating the video: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => "Error updating the video"
+            ], 500);
+        }
     }
 
     public function destroy(int $id)

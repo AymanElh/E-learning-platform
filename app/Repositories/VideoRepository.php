@@ -39,7 +39,31 @@ class VideoRepository implements VideoRepositoryInterface
 
     public function update(int $id, array $data, $file)
     {
-        // TODO: Implement update() method.
+        try {
+            $video = Video::find($id);
+            if(!$video) {
+                return null;
+            }
+            if ($file) {
+                // Delete old file
+                Storage::disk('public')->delete($video->file_path);
+
+                // Store new file
+                $path = $file->store('course-videos/' . $video->course_id, 'public');
+                $video->video_path = $path;
+
+            }
+
+            // Update other fields
+            $video->title = $data['title'] ?? $video->title;
+            $video->description = $data['description'] ?? $video->description;
+
+            $video->save();
+            return $video;
+        } catch(Exception $e) {
+            \Log::error("Error updating the video: " . $e->getMessage());
+            return null;
+        }
     }
 
     public function delete(int $id)
