@@ -53,7 +53,12 @@ class AuthRepository implements AuthRepositoryInterface
     public function getAuthenticatedUser(): User|\Illuminate\Contracts\Auth\Authenticatable|null
     {
         try {
-            return auth()->user();
+            $user =  auth()->user();
+            if($user) {
+                $user->load('roles', 'permissions');
+                $user->role_names = $user->getRoleNames();
+                $user->permission_names = $user->getAllPermissions()->pluck('name');
+            }
         } catch (Exception $e) {
             return null;
         }
@@ -65,7 +70,8 @@ class AuthRepository implements AuthRepositoryInterface
             Storage::disk('public')->delete($user->profile_picture);
         }
         $path = $file->store('images', 'public');
-        $user->update(['profile_picture', $path]);
+//        dd($user->profile_picture);
+        $user->update(['profile_picture' => $path]);
 
         return $user;
     }
