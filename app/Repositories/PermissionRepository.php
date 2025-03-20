@@ -13,9 +13,14 @@ class PermissionRepository implements PermissionRepositoryInterface
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getAllPermissions()
+    public function getAllPermissions(): ?\Illuminate\Database\Eloquent\Collection
     {
-        return Permission::all();
+        try {
+            return Permission::all();
+        } catch (\Exception $e) {
+            \Log::error("Error fetching permissions: " . $e->getMessage());
+            return null;
+        }
     }
 
     /**
