@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\TagController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\RoleController;
 
+
 Route::prefix('v1')->group(function() {
     // public routes
     Route::post('/register', [AuthController::class, 'register'])->name('register');
@@ -46,7 +47,7 @@ Route::prefix('v1')->group(function() {
         Route::middleware('permission:delete courses')->delete('/courses/{course}', [CourseController::class, 'destroy']);
 
         // Course tag management with permission checks
-        Route::middleware('permission:edit courses')->group(function() {
+        Route::middleware('permission:edit courses')->group(function () {
             Route::post('/courses/{course}/tags', [CourseController::class, 'attachTags']);
             Route::put('/courses/{course}/tags', [CourseController::class, 'syncTags']);
             Route::delete('/courses/{course}/tags', [CourseController::class, 'detachTags']);
@@ -67,14 +68,14 @@ Route::prefix('v1')->group(function() {
         Route::middleware('permission:delete courses')->delete('/videos/{video}', [VideoController::class, 'destroy']);
 
         // Statistics routes with permission checks
-        Route::middleware('permission:view statistics')->prefix('stats')->group(function() {
+        Route::middleware('permission:view statistics')->prefix('stats')->group(function () {
             Route::get('/categories', [StatisticsController::class, 'getCategoryStats']);
             Route::get('/tags', [StatisticsController::class, 'getTagStats']);
             Route::get('/courses', [StatisticsController::class, 'getCourseStats']);
         });
 
         // Roles & Permissions management (admin only)
-        Route::middleware('permission:manage roles')->group(function() {
+        Route::middleware('permission:manage roles')->group(function () {
             Route::apiResource('/roles', RoleController::class);
             Route::post('/roles/{role}/permissions', [RoleController::class, 'assignPermissions']);
             Route::delete('/roles/{role}/permissions', [RoleController::class, 'removePermissions']);
