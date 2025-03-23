@@ -18,14 +18,15 @@ beforeEach(function() {
     Permission::create(['name' => 'manage courses']);
     Permission::create(['name' => 'create courses']);
     Permission::create(['name' => 'edit courses']);
+    Permission::create(['name' => 'delete courses']);
 
     // Create mentor role
-    $role = Role::create(['name' => 'instructor']);
-    $role->givePermissionTo(['create courses', 'edit courses', 'manage courses']);
+    $role = Role::create(['name' => 'mentor']);
+    $role->givePermissionTo(['create courses', 'edit courses', 'manage courses', 'delete courses']);
 
-    // Create user with instructor role
+    // Create user with mentor role
     $this->user = User::factory()->create();
-    $this->user->assignRole('instructor');
+    $this->user->assignRole('mentor');
 
     // Create course
     $this->course = Course::factory()->create();
@@ -37,7 +38,7 @@ beforeEach(function() {
     $this->videoFile = UploadedFile::fake()->create('sample.mp4', 1024, 'video/mp4');
 });
 
-test('instructor can add video to course', function () {
+test('mentor can add video to course', function () {
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $this->token,
     ])->postJson("/api/v1/courses/{$this->course->id}/videos", [
@@ -65,7 +66,7 @@ test('instructor can add video to course', function () {
     Storage::disk('public')->assertExists($video->file_path);
 });
 
-test('instructor can get course videos', function () {
+test('mentor can get course videos', function () {
     // Create some videos
     $video1 = Video::create([
         'course_id' => $this->course->id,
@@ -93,7 +94,7 @@ test('instructor can get course videos', function () {
 });
 
 
-test('instructor can update video details', function () {
+test('mentor can update video details', function () {
     $video = Video::create([
         'course_id' => $this->course->id,
         'title' => 'Original Title',
@@ -121,7 +122,7 @@ test('instructor can update video details', function () {
     ]);
 });
 
-test('instructor can update video with new file', function () {
+test('mentor can update video with new file', function () {
     $video = Video::create([
         'course_id' => $this->course->id,
         'title' => 'Original Video',
@@ -156,7 +157,7 @@ test('instructor can update video with new file', function () {
     Storage::disk('public')->assertExists($updatedVideo->file_path);
 });
 
-test('instructor can delete video', function () {
+test('mentor can delete video', function () {
     $video = Video::create([
         'course_id' => $this->course->id,
         'title' => 'Temporary Video',
