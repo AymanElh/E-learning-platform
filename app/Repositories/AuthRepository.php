@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Interfaces\AuthRepositoryInterface;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Mockery\Exception;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -75,4 +76,35 @@ class AuthRepository implements AuthRepositoryInterface
 
         return $user;
     }
+
+    public function updateProfile(array $data)
+    {
+        try {
+            $user = auth()->user();
+            if(!$user) {
+                return null;
+            }
+
+            $user->name = $data['name'] ?? $user->name;
+
+            if(isset($data['email']) && $data['email'] !== $user->email) {
+                if(User::where('email', $data['email'])->where('id', '!=', $user->id)->exists()) {
+                    throw new Exception("Email is already in use");
+                }
+                $user->email = $data['email'];
+            }
+
+            if(isset($data['password'])) {
+                $user->password = Hash::make($data['password']);
+            }
+
+            $user->save();
+            return $user;
+        } catch(Exception $e) {
+            \Log::error("Error updating the user: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+
 }

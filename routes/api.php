@@ -23,6 +23,7 @@ Route::prefix('v1')->group(function() {
 
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
+        Route::put('/profile', [AuthController::class, 'updateProfile'])->name('update-profile');
         Route::post('/profile-picture', [AuthController::class, 'uploadProfilePicture']);
 
         // Tag

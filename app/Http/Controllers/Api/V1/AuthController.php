@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\LoginRequest;
 use App\Http\Requests\V1\RegisterRequest;
+use App\Http\Requests\V1\UpdateProfileRequest;
 use App\Models\User;
 use App\Repositories\AuthRepository;
 use Auth;
@@ -131,5 +132,22 @@ class AuthController extends Controller
                 'user' => $updatedUser
             ]
         ]);
+    }
+
+    public function updateProfile(UpdateProfileRequest $request)
+    {
+        try {
+            $user = $this->authRepository->updateProfile($request->validated());
+            return response()->json([
+                'success' => true,
+                'message' => "Profile updated successfully",
+                'user' => $user
+            ]);
+        } catch(\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 405);
+        }
     }
 }
