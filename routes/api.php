@@ -39,6 +39,7 @@ Route::prefix('v1')->group(function() {
         Route::middleware('permission:create categories')->post('/categories', [CategoryController::class, 'store']);
         Route::middleware('permission:edit categories')->put('/categories/{category}', [CategoryController::class, 'update']);
         Route::middleware('permission:delete categories')->delete('/categories/{category}', [CategoryController::class, 'destroy']);
+        Route::get('/categories/{category}/children', [CategoryController::class, 'children']);
 
         // Course routes with permission checks
         Route::get('/courses', [CourseController::class, 'index']);

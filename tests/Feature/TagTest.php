@@ -1,8 +1,27 @@
 <?php
 
 use App\Models\Tag;
+use App\Models\User;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+
+beforeEach(function() {
+    $createPermission = Permission::firstOrCreate(['name' => 'create tags']);
+    $editPermission = Permission::firstOrCreate(['name' => 'edit tags']);
+    $deletePermission = Permission::firstOrCreate(['name' => 'delete tags']);
+
+    $role = Role::firstOrCreate(['name' => 'admin']);
+    $role->syncPermissions([$createPermission, $editPermission, $deletePermission]);
+
+    $this->user = User::factory()->create();
+    $this->user->assignRole('admin');
+
+    $this->token = auth()->login($this->user);
+
+    $this->actingAs($this->user, 'api');
+});
 
 test('can get all tags', function() {
     Tag::factory(5)->create();

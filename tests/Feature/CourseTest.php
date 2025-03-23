@@ -3,8 +3,27 @@
 use App\Models\Course;
 use App\Models\Category;
 use App\Models\Tag;
+use App\Models\User;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+
+beforeEach(function() {
+    $createPermission = Permission::firstOrCreate(['name' => 'create courses']);
+    $editPermission = Permission::firstOrCreate(['name' => 'edit courses']);
+    $deletePermission = Permission::firstOrCreate(['name' => 'delete courses']);
+
+    $role = Role::firstOrCreate(['name' => 'mentor']);
+    $role->syncPermissions([$createPermission, $editPermission, $deletePermission]);
+
+    $this->user = User::factory()->create();
+    $this->user->assignRole('mentor');
+
+    $this->token = auth()->login($this->user);
+
+    $this->actingAs($this->user, 'api');
+});
 
 test('can get all courses', function() {
     // Create some categories and tags first

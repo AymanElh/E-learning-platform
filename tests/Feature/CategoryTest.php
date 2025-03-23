@@ -1,8 +1,27 @@
 <?php
 
 use App\Models\Category;
+use App\Models\User;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+
+beforeEach(function() {
+    $createPermission = Permission::firstOrCreate(['name' => 'create categories']);
+    $editPermission = Permission::firstOrCreate(['name' => 'edit categories']);
+    $deletePermission = Permission::firstOrCreate(['name' => 'delete categories']);
+
+    $role = Role::firstOrCreate(['name' => 'admin']);
+    $role->syncPermissions([$createPermission, $editPermission, $deletePermission]);
+
+    $this->user = User::factory()->create();
+    $this->user->assignRole('admin');
+
+    $this->token = auth()->login($this->user);
+
+    $this->actingAs($this->user, 'api');
+});
 
 test('can get all categories', function() {
     Category::factory(5)->create();
@@ -26,10 +45,12 @@ test('can fetch one category', function() {
 
     $response->assertStatus(200)
         ->assertJsonStructure([
-            'id',
-            'name',
-            'description',
-            'category_id'
+            'data' => [
+                'id',
+                'name',
+                'categoryId',
+                'description'
+            ]
         ]);
 });
 
@@ -113,9 +134,11 @@ test('can get children categories', function() {
             'success',
             'message',
             'categories' => [
-                '*' => ['id', 'name', 'description', 'category_id']
+                '*' => [
+                    'id', 'name', 'categoryId', 'description'
+                ]
             ]
         ]);
 
-    $this->assertCount(3, $response['categories']['data']);
+    $this->assertCount(3, $response['categories']);
 });
