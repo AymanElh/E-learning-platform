@@ -38,4 +38,14 @@ class Course extends Model
     {
         return $this->belongsToMany(Tag::class);
     }
+
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    public function videos()
+    {
+        return $this->hasMany(Video::class);
+    }
 }

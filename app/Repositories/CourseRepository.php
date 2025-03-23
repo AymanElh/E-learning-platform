@@ -14,7 +14,7 @@ class CourseRepository implements CourseRepositoryInterface
      */
     public function getAll(): \Illuminate\Database\Eloquent\Collection
     {
-        return Course::with(['category', 'tags'])->get();
+        return Course::with(['videos', 'category', 'tags'])->get();
     }
 
     /**

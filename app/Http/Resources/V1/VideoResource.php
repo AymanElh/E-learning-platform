@@ -5,7 +5,7 @@ namespace App\Http\Resources\V1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CategoryResource extends JsonResource
+class VideoResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,10 +15,11 @@ class CategoryResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'categoryId' => $this->category_id,
-            'description' => $this->description
+//            'id' => $this->id,
+            'title' => $this->title,
+            'description' => $this->description,
+            'video' => $this->video_path,
+            'duration' => $this->duration
         ];
     }
 }
