@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CourseController;
 use App\Http\Controllers\Api\V1\EnrollmentController;
+use App\Http\Controllers\Api\V1\PaypalController;
 use App\Http\Controllers\Api\V1\PermissionController;
 use App\Http\Controllers\Api\V1\StatisticsController;
 use App\Http\Controllers\Api\V1\VideoController;
@@ -84,5 +85,11 @@ Route::prefix('v1')->group(function() {
 
             Route::apiResource('/permissions', PermissionController::class);
         });
+
+        // Paypal routes
     });
+        Route::prefix('/paypal')->name('api.paypal.')->group(function() {
+            Route::get('/success', [PaypalController::class, 'success'])->name('success');
+            Route::get('/cancel', [PaypalController::class, 'cancel'])->name('cancel');
+        });
 });

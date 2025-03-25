@@ -11,6 +11,11 @@ class Enrollment extends Model
      */
     protected $fillable = ['user_id', 'course_id', 'status'];
 
+    protected $casts = [
+        'require_payment' => 'boolean',
+        'payment_completed' => 'boolean',
+    ];
+
     /**
      * Get the user that enrolled a course
      *
@@ -29,5 +34,10 @@ class Enrollment extends Model
     public function course(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Course::class);
+    }
+
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
     }
 }

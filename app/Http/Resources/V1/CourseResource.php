@@ -21,6 +21,7 @@ class CourseResource extends JsonResource
             'duration' => $this->duration,
             'difficulty' => $this->difficulty,
             'status' => $this->status,
+            'price' => $this->price,
             'videos' =>  VideoResource::collection($this->whenLoaded('videos')),
             'category' => new CategoryResource($this->whenLoaded('category')),
             'tags' => TagResource::collection($this->whenLoaded('tags'))
