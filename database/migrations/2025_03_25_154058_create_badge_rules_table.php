@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('badges_rules', function (Blueprint $table) {
+        Schema::create('badge_rules', function (Blueprint $table) {
             $table->id();
             $table->foreignId('badge_id')->constrained()->onDelete('cascade');
             $table->string('requirement_type');

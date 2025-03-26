@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('badges', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('slug');
             $table->text('description')->nullable();
             $table->enum('type', ['student', 'mentor', 'both'])->default('both');
             $table->timestamps();

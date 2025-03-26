@@ -8,6 +8,9 @@ use App\Services\BadgeService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
+/**
+ *
+ */
 class CheckMentorBadges
 {
     /**
@@ -28,18 +31,28 @@ class CheckMentorBadges
         $this->checkCourseCreatorBadge($mentor);
     }
 
-    public function checkCourseCreatorBadge($mentor): void
+    /**
+     * Check if the mentor has already the badge and count the created courses.
+     *
+     * @param $mentor
+     * @return void
+     */
+    private function checkCourseCreatorBadge($mentor): void
     {
-        $coursesCount = $mentor->courses()->count();
-        $badge = Badge::where('name', 'course-creator')->first();
-        if(!$badge) {
+        $courseCount = $mentor->courses()->count();
+        \Log::info("Mentor {$mentor->id} now has {$courseCount} published courses");
+
+        $badge = Badge::where('slug', 'course-creator')->first();
+
+        if (!$badge) {
+            \Log::error("Course Creator badge not found in database");
             return;
         }
 
-        $data = [
-            'course_count' => $coursesCount
+        $context = [
+            'courses_published_count' => $courseCount,
         ];
 
-        $this->badgeService->checkBadge($mentor, $badge, $data);
+        $this->badgeService->checkAndAwardBadge($mentor, $badge, $context);
     }
 }

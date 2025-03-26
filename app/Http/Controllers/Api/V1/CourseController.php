@@ -29,7 +29,7 @@ class CourseController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $courses = new CourseCollection($this->courseRepository->getAll());
+            $courses = new CourseCollection($this->courseRepository->getAll($request->query()));
 
             return response()->json([
                 'success' => true,
@@ -61,7 +61,7 @@ class CourseController extends Controller
                 'data' => new CourseResource($course)
             ], 201);
         } catch (\Exception $e) {
-            Log::error("Error creating course: " . $e->getMessage());
+            Log::error("Error creating course: " . $e->getMessage() . " On this line: " . $e->getLine() . " in this file" . $e->getFile());
             return response()->json([
                 'success' => false,
                 'message' => "Course creation failed"

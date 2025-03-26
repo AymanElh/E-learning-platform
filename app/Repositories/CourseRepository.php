@@ -64,6 +64,7 @@ class CourseRepository implements CourseRepositoryInterface
             'difficulty' => $data['difficulty'],
             'status' => $data['status'] ?? 'open',
             'category_id' => $data['category_id'],
+            'user_id' => auth()->id()
         ]);
 
         // Sync tags if provided
