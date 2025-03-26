@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Events\CourseCreated;
+use App\Events\EnrollmentCreated;
 use App\Listeners\CheckMentorBadges;
+use App\Listeners\CheckStudentBadges;
 use Illuminate\Support\ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -12,6 +14,11 @@ class EventServiceProvider extends ServiceProvider
         // Other events...
         CourseCreated::class => [
             CheckMentorBadges::class,
+        ],
+
+        EnrollmentCreated::class => [
+            CheckMentorBadges::class,
+            CheckStudentBadges::class
         ],
     ];
     /**

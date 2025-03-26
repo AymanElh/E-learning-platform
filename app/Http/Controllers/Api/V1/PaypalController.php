@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Enrollment;
 use App\Services\PaypalService;
 use Illuminate\Http\Request;
 
@@ -24,6 +25,7 @@ class PaypalController extends Controller
             $result = $this->paypalService->complete($token);
             $orderDetails = $this->paypalService->getOrderDetails($token);
             \Log::info("Order details: ", $orderDetails);
+//            event(new \App\Events\EnrollmentCreated($result));
             return response()->json([
                 'success' => true,
                 'message' => 'Payment completed successfully',

@@ -50,7 +50,7 @@ class EnrollmentController extends Controller
                 'status' => $requiresPayment ? 'pending' : 'accepted',
                 'require_payment' => $requiresPayment
             ]);
-
+//            dd($enrollment);
             // For courses requiring payment
             if ($requiresPayment) {
                 $price = $course->price;
@@ -94,6 +94,7 @@ class EnrollmentController extends Controller
                         // Commit transaction before returning response
                         \DB::commit();
 
+                        event(new \App\Events\EnrollmentCreated($enrollment));
                         return response()->json([
                             'success' => true,
                             'message' => "This course requires payment to enroll",
@@ -116,7 +117,7 @@ class EnrollmentController extends Controller
                         ], 500);
                     }
                 } catch (\Exception $e) {
-                    \Log::error('PayPal payment setup failed: ' . $e->getMessage(), [
+                    \Log::error('PayPal payment setup failed: ' . $e->getMessage() . $e->getLine(), [
                         'enrollment_id' => $enrollment->id,
                         'payment_id' => $payment->id ?? null,
                         'trace' => $e->getTraceAsString()
