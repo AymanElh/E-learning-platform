@@ -7,6 +7,7 @@ use App\Http\Requests\V1\CategoryRequest;
 use App\Http\Resources\V1\CategoryCollection;
 use App\Http\Resources\V1\CategoryResource;
 use App\Interfaces\CategoryRepositoryInterface;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -17,9 +18,9 @@ class CategoryController extends Controller
         $this->categoryRepository = $category;
     }
 
-    public function index(): \Illuminate\Http\JsonResponse
+    public function index(Request $request): \Illuminate\Http\JsonResponse
     {
-        $categories = new CategoryCollection($this->categoryRepository->index());
+        $categories = new CategoryCollection($this->categoryRepository->index($request->query()));
         return response()->json([
             'success' => true,
             'message' => "Categories retrieved successfully",

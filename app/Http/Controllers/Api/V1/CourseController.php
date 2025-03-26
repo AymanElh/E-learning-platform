@@ -9,6 +9,7 @@ use App\Http\Resources\V1\CourseCollection;
 use App\Http\Resources\V1\CourseResource;
 use App\Repositories\CourseRepository;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class CourseController extends Controller
@@ -23,11 +24,11 @@ class CourseController extends Controller
     /**
      * Get all courses (paginated).
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         try {
-            $courses = new CourseCollection($this->courseRepository->getAll());
-
+            $courses = new CourseCollection($this->courseRepository->getAll($request->query()));
+//            dd($courses);
             return response()->json([
                 'success' => true,
                 'message' => "Courses retrieved successfully",

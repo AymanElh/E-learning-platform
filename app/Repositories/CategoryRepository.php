@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Filters\V1\CategoryFilter;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Models\Category;
 
@@ -15,14 +16,15 @@ class CategoryRepository implements CategoryRepositoryInterface
         //
     }
 
-    /**
-     * Get all categories
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function index(): \Illuminate\Database\Eloquent\Collection
+    public function index(array $data)
     {
-        return Category::all();
+        $filter = new CategoryFilter();
+        $queryItems = $filter->transform($data);
+        if(count($queryItems) == 0) {
+            return Category::paginate();
+        } else {
+            return Category::where($queryItems)->paginate();
+        }
     }
 
     /**

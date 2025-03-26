@@ -2,14 +2,11 @@
 
 namespace App\Interfaces;
 
+use Illuminate\Http\Request;
+
 interface CategoryRepositoryInterface
 {
-    /**
-     * Get all categories
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function index();
+    public function index(array $data);
 
     /**
      * Get category by ID

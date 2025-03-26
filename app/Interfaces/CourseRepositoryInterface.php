@@ -4,7 +4,7 @@ namespace App\Interfaces;
 
 interface CourseRepositoryInterface
 {
-    public function getAll();
+    public function getAll(array $filters = []);
     public function getById(int $id);
     public function store(array $data);
     public function update(int $id, array $data);

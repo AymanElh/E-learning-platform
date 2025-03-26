@@ -2,19 +2,40 @@
 
 namespace App\Repositories;
 
+use App\Filters\V1\CourseFilter;
 use App\Interfaces\CourseRepositoryInterface;
 use App\Models\Course;
 
 class CourseRepository implements CourseRepositoryInterface
 {
-    /**
-     * Get all courses with relationships.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function getAll(): \Illuminate\Database\Eloquent\Collection
+
+    public function getAll(array $filters = [])
     {
-        return Course::with(['videos', 'category', 'tags'])->get();
+        \Log::info('Fetching courses with filters', $filters);
+
+        try {
+            $query = Course::query();
+
+            // Apply filters if needed
+            if (isset($filters['category'])) {
+                $query->where('category_id', $filters['category']);
+            }
+
+            if (isset($filters['difficulty'])) {
+                $query->where('difficulty_level', $filters['difficulty']);
+            }
+
+            // Add any other filters or transformations here
+
+            $courses = $query->with(['category', 'tags'])->paginate(); // Eager load relationships
+
+            \Log::info('Courses fetched successfully', $courses->toArray());
+
+            return $courses;
+        } catch (\Exception $e) {
+            \Log::error("Error fetching courses: " . $e->getMessage());
+            throw $e; // Re-throw the exception to be caught in the controller
+        }
     }
 
     /**
