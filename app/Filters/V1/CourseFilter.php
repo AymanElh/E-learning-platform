@@ -19,6 +19,10 @@ class CourseFilter
         'gt' => '='
     ];
 
+    /**
+     * @param array $filter
+     * @return array
+     */
     public function transform(array $filter) : array
     {
         $eloQuery = [];

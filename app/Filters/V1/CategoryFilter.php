@@ -2,6 +2,9 @@
 
 namespace App\Filters\V1;
 
+/**
+ *
+ */
 class CategoryFilter
 {
     protected array $safeParams = [
@@ -15,6 +18,12 @@ class CategoryFilter
         'gt' => '='
     ];
 
+    /**
+     * Method to transform the params into conditions for filtering
+     *
+     * @param array $filters
+     * @return array
+     */
     public function transform (array $filters): array
     {
         $eloQuery = [];
