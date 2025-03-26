@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\CourseCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\CourseRequest;
 use App\Http\Requests\V1\CourseTagsRequest;
@@ -10,6 +11,7 @@ use App\Http\Resources\V1\CourseResource;
 use App\Repositories\CourseRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class CourseController extends Controller
@@ -27,8 +29,8 @@ class CourseController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $courses = new CourseCollection($this->courseRepository->getAll($request->query()));
-//            dd($courses);
+            $courses = new CourseCollection($this->courseRepository->getAll());
+
             return response()->json([
                 'success' => true,
                 'message' => "Courses retrieved successfully",
@@ -52,6 +54,7 @@ class CourseController extends Controller
 
         try {
             $course = $this->courseRepository->store($data);
+            event(new CourseCreated($course, Auth::user()));
             return response()->json([
                 'success' => true,
                 'message' => "Course created successfully",

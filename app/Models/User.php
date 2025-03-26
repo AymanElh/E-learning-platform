@@ -49,7 +49,7 @@ class User extends Authenticatable implements JWTSubject
      * Return a key value array, containing any custom claims to be added to the JWT.
      * @return array
      */
-    public function getJWTCustomClaims()
+    public function getJWTCustomClaims() : array
     {
         return [];
     }
@@ -65,5 +65,10 @@ class User extends Authenticatable implements JWTSubject
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function badges()
+    {
+        return $this->hasMany(Badge::class);
     }
 }
