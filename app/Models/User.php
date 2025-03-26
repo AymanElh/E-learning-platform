@@ -67,8 +67,19 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
-    public function badges()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function badges(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->hasMany(Badge::class);
+        return $this->belongsToMany(Badge::class, 'user_badges');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function courses(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Course::class);
     }
 }

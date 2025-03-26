@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ *
+ */
 class BadgeRule extends Model
 {
     protected $fillable = [
@@ -14,11 +17,18 @@ class BadgeRule extends Model
         'value'
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function badge(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Badge::class);
     }
 
+    /**
+     * @param $actualValue
+     * @return bool
+     */
     public function isMet($actualValue) : bool
     {
         $operator = $this->operator;

@@ -21,7 +21,8 @@ class Course extends Model
         'difficulty',
         'status',
         'price',
-        'category_id'
+        'category_id',
+        'user_id'
     ];
 
     /**
