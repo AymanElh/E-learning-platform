@@ -46,15 +46,28 @@ class BadgeService
     protected function meetsAllRequirements(User $user, Badge $badge, array $context = []): bool
     {
         $requirements = $badge->rules;
-//        dd($requirements);
+
         if ($requirements->isEmpty()) {
             \Log::warning("Badge {$badge->name} has no requirements");
             return false;
         }
 
         foreach ($requirements as $requirement) {
+            // Get the actual value for this requirement
             $actualValue = $this->getRequirementValue($user, $requirement, $context);
 
+            // Debug log for each requirement check
+            \Log::info("Badge requirement check", [
+                'user_id' => $user->id,
+                'badge_name' => $badge->name,
+                'requirement_key' => $requirement->requirement_key,
+                'operator' => $requirement->operator,
+                'required_value' => $requirement->value,
+                'actual_value' => $actualValue,
+                'is_met' => $requirement->isMet($actualValue)
+            ]);
+
+            // Check if this requirement is met
             if (!$requirement->isMet($actualValue)) {
                 \Log::info("User {$user->id} does not meet requirement {$requirement->requirement_key} for badge {$badge->name}. Required: {$requirement->operator} {$requirement->value}, Actual: {$actualValue}");
                 return false;
@@ -63,7 +76,6 @@ class BadgeService
 
         return true;
     }
-
     /**
      * Get the actual value for a requirement from user data or context
      *
@@ -94,6 +106,7 @@ class BadgeService
 
             case 'activity':
                 return $this->getActivityRequirementValue($user, $key);
+
 
             default:
                 \Log::warning("Unknown requirement type: {$requirement->requirement_type}");

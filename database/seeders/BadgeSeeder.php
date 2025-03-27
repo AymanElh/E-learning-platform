@@ -47,20 +47,36 @@ class BadgeSeeder extends Seeder
 //            'value' => '50'
 //        ]);
 
+//        $badge = Badge::create([
+//            'name' => 'Dedicated Student',
+//            'slug' => 'dedicated-student',
+//            'description' => 'Enrolled in at least 10 different courses',
+//            'type' => 'student'
+//        ]);
+//
+//        // Add the requirement for this badge
+//        BadgeRule::create([
+//            'badge_id' => $badge->id,
+//            'requirement_type' => 'student',
+//            'requirement_key' => 'enrolled_courses_count',
+//            'operator' => '>=',
+//            'value' => '10'
+//        ]);
+
         $badge = Badge::create([
-            'name' => 'Dedicated Student',
-            'slug' => 'dedicated-student',
-            'description' => 'Enrolled in at least 10 different courses',
-            'type' => 'student'
+            'name' => 'Mentor\'s Fan',
+            'slug' => 'mentors-fan',
+            'description' => 'Enrolled in at least 2 courses from the same mentor',
+            'type' => 'student',
         ]);
 
         // Add the requirement for this badge
         BadgeRule::create([
             'badge_id' => $badge->id,
             'requirement_type' => 'student',
-            'requirement_key' => 'enrolled_courses_count',
+            'requirement_key' => 'courses_from_same_mentor',
             'operator' => '>=',
-            'value' => '10'
+            'value' => '2'
         ]);
     }
 }

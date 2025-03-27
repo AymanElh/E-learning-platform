@@ -93,7 +93,6 @@ class EnrollmentController extends Controller
 
                         // Commit transaction before returning response
                         \DB::commit();
-
                         event(new \App\Events\EnrollmentCreated($enrollment));
                         return response()->json([
                             'success' => true,
@@ -132,6 +131,7 @@ class EnrollmentController extends Controller
 
             // For free courses, we're good to go
             \DB::commit();
+            event(new \App\Events\EnrollmentCreated($enrollment));
             return response()->json([
                 'success' => true,
                 'message' => "Course enrolled successfully",
