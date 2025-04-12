@@ -27,7 +27,7 @@ class CourseRequest extends FormRequest
             'duration' => 'required|integer|min:1',
             'difficulty' => 'required|in:beginner,intermediate,advanced',
             'status' => 'nullable|in:open,in_progress,completed',
-            'price' => 'nullable|decimal:10,2',
+            'price' => 'nullable',
             'category_id' => 'required|exists:categories,id',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',

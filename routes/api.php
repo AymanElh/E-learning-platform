@@ -7,20 +7,27 @@ use App\Http\Controllers\Api\V1\PaypalController;
 use App\Http\Controllers\Api\V1\PermissionController;
 use App\Http\Controllers\Api\V1\StatisticsController;
 use App\Http\Controllers\Api\V1\VideoController;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\TagController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\RoleController;
 
+Route::get('/', function() {
+    return response()->json([
+        'laravel' => App::version()
+    ]);
+});
 
 Route::prefix('v1')->group(function() {
+
     // public routes
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/refresh', [AuthController::class, 'refresh']);
 
     // Routes that require authentication
-    Route::middleware('auth:api')->group(function() {
+    // Route::middleware('auth:api')->group(function() {
 
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
@@ -45,10 +52,12 @@ Route::prefix('v1')->group(function() {
         // Course routes with permission checks
         Route::get('/courses', [CourseController::class, 'index']);
         Route::get('/courses/{course}', [CourseController::class, 'show']);
-        Route::middleware('permission:create courses')->post('/courses', [CourseController::class, 'store']);
-        Route::middleware('permission:edit courses')->put('/courses/{course}', [CourseController::class, 'update']);
-        Route::middleware('permission:delete courses')->delete('/courses/{course}', [CourseController::class, 'destroy']);
-
+//        Route::middleware('permission:create courses')->post('/courses', [CourseController::class, 'store']);
+        Route::post('/courses', [CourseController::class, 'store']);
+//        Route::middleware('permission:edit courses')->put('/courses/{course}', [CourseController::class, 'update']);
+        Route::put('/courses/{course}', [CourseController::class, 'update']);
+//        Route::middleware('permission:delete courses')->delete('/courses/{course}', [CourseController::class, 'destroy']);
+        Route::delete('/courses/{course}', [CourseController::class, 'destroy']);
         // Course tag management with permission checks
         Route::middleware('permission:edit courses')->group(function () {
             Route::post('/courses/{course}/tags', [CourseController::class, 'attachTags']);
@@ -71,11 +80,13 @@ Route::prefix('v1')->group(function() {
         Route::middleware('permission:delete courses')->delete('/videos/{video}', [VideoController::class, 'destroy']);
 
         // Statistics routes with permission checks
-        Route::middleware('permission:view statistics')->prefix('stats')->group(function () {
+//        Route::middleware('permission:view statistics')->prefix('stats')->group(function () {
+        Route::prefix('stats')->group(function() {
             Route::get('/categories', [StatisticsController::class, 'getCategoryStats']);
             Route::get('/tags', [StatisticsController::class, 'getTagStats']);
             Route::get('/courses', [StatisticsController::class, 'getCourseStats']);
         });
+//        });
 
         // Roles & Permissions management (admin only)
         Route::middleware('permission:manage roles')->group(function () {
@@ -87,7 +98,7 @@ Route::prefix('v1')->group(function() {
         });
 
         // Paypal routes
-    });
+    // });
         Route::prefix('/paypal')->name('api.paypal.')->group(function() {
             Route::get('/success', [PaypalController::class, 'success'])->name('success');
             Route::get('/cancel', [PaypalController::class, 'cancel'])->name('cancel');
