@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\CourseCreated;
+use App\Events\EnrollmentCreated;
 use App\Models\Badge;
 use App\Services\BadgeService;
 use Illuminate\Contracts\Queue\ShouldQueue;

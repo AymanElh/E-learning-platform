@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Badge;
+use App\Models\BadgeRule;
 use App\Models\User;
 use App\Models\UserBadge;
 use App\Notifications\BadgeEarned;
@@ -56,7 +57,6 @@ class BadgeService
             // Get the actual value for this requirement
             $actualValue = $this->getRequirementValue($user, $requirement, $context);
 
-            // Debug log for each requirement check
             \Log::info("Badge requirement check", [
                 'user_id' => $user->id,
                 'badge_name' => $badge->name,
@@ -80,7 +80,7 @@ class BadgeService
      * Get the actual value for a requirement from user data or context
      *
      * @param User $user The user to check
-     * @param BadgeRequirement $requirement The requirement to evaluate
+     * @param BadgeRule $requirement The requirement to evaluate
      * @param array $context Additional context data
      * @return mixed The actual value for this requirement
      */
@@ -183,7 +183,6 @@ class BadgeService
                 return $user->created_at->diffInMonths(now());
 
             case 'is_active':
-                // Simplified - you'd implement actual activity tracking
                 return $user->last_login_at && $user->last_login_at->diffInDays(now()) < 30;
 
             default:
