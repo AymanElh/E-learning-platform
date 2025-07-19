@@ -19,7 +19,8 @@ WORKDIR /var/www/html
 
 RUN a2enmod rewrite
 
-RUN docker-php-ext-install pdo pdo_pgsql
+# Install PHP extensions including MySQL PDO driver
+RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

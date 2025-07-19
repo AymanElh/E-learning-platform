@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('duration');
             $table->enum('difficulty', ['beginner', 'intermediate', 'advanced']);
             $table->enum('status', ['open', 'in_progress', 'completed'])->default('open');
-            $table->foreignId('category_id')->constrained()->onDelete('set null');
+            $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();
         });
     }

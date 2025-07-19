@@ -6,6 +6,7 @@ services:
             context: .
             dockerfile: Dockerfile
         container_name: learning_app
+        restart: always
         ports:
             - "8888:8080"
         volumes:
@@ -14,11 +15,13 @@ services:
             - TZ=UTC
         depends_on:
             - mysql
+        networks:
+            - learning_network
 
     mysql:
         image: mysql:8.0
         container_name: learning-mysql
-        restart: unless-stopped
+        restart: always
         environment:
             MYSQL_DATABASE: laravel_db
             MYSQL_ROOT_PASSWORD: root_password
@@ -28,11 +31,13 @@ services:
             - mysql_data:/var/lib/mysql
         ports:
             - "3307:3306"
+        networks:
+            - learning_network
 
     phpmyadmin:
         image: phpmyadmin/phpmyadmin:latest
         container_name: learning-phpmyadmin
-        restart: unless-stopped
+        restart: always
         environment:
             PMA_HOST: mysql
             PMA_PORT: 3306
@@ -42,6 +47,12 @@ services:
             - "8081:80"
         depends_on:
             - mysql
+        networks:
+            - learning_network
 
 volumes:
     mysql_data:
+
+networks:
+    learning_network:
+        driver: bridge
