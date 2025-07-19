@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+    php:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: learning_app
+        ports:
+            - "8888:8080"
+        volumes:
+            - .:/var/www/html
+        environment:
+            - TZ=UTC
+        depends_on:
+            - sqlite
+
+    sqlite:
+        image: nouchka/sqlite3:latest
+        container_name: laravel-sqlite
+        volumes:
+            - sqlite_data:/sqlite
+        environment:
+            - SQLITE_DATABASE=/sqlite/database.db
+
+volumes:
+    sqlite_data:
