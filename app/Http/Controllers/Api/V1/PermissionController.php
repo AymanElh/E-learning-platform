@@ -10,6 +10,12 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Mockery\Exception;
 
+/**
+ * @OA\Tag(
+ *     name="Permissions",
+ *     description="API endpoints for permission management"
+ * )
+ */
 class PermissionController extends Controller
 {
     protected PermissionRepository $permissionRepository;
@@ -25,7 +31,49 @@ class PermissionController extends Controller
         $this->permissionRepository = $permissionRepository;
     }
 
-
+    /**
+     * @OA\Get(
+     *     path="/api/v1/permissions",
+     *     tags={"Permissions"},
+     *     summary="Get all permissions",
+     *     description="Retrieve a list of all permissions in the system",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Permissions retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="create-course"),
+     *                     @OA\Property(property="guard_name", type="string", example="api"),
+     *                     @OA\Property(property="created_at", type="string", format="datetime"),
+     *                     @OA\Property(property="updated_at", type="string", format="datetime")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No permissions found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="No permissions found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     )
+     * )
+     */
     public function index()
     {
         try {
@@ -49,6 +97,55 @@ class PermissionController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/v1/permissions",
+     *     tags={"Permissions"},
+     *     summary="Create a new permission",
+     *     description="Create a new permission in the system",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="string", example="edit-course", description="Permission name (should be kebab-case)"),
+     *             @OA\Property(property="guard_name", type="string", example="api", description="Guard name for the permission")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Permission created successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Permission created successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="edit-course"),
+     *                 @OA\Property(property="guard_name", type="string", example="api"),
+     *                 @OA\Property(property="created_at", type="string", format="datetime"),
+     *                 @OA\Property(property="updated_at", type="string", format="datetime")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
     public function store(PermissionRequest $request)
     {
         try{
@@ -66,7 +163,53 @@ class PermissionController extends Controller
         }
     }
 
-
+    /**
+     * @OA\Get(
+     *     path="/api/v1/permissions/{id}",
+     *     tags={"Permissions"},
+     *     summary="Get a specific permission",
+     *     description="Retrieve a single permission by its ID",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Permission ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Permission retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="create-course"),
+     *                 @OA\Property(property="guard_name", type="string", example="api"),
+     *                 @OA\Property(property="created_at", type="string", format="datetime"),
+     *                 @OA\Property(property="updated_at", type="string", format="datetime")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Permission not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Permission not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     )
+     * )
+     */
     public function show($id)
     {
         $permission = $this->permissionRepository->getPermissionById($id);
@@ -84,6 +227,68 @@ class PermissionController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Put(
+     *     path="/api/v1/permissions/{id}",
+     *     tags={"Permissions"},
+     *     summary="Update a permission",
+     *     description="Update an existing permission by its ID",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Permission ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", example="updated-permission-name"),
+     *             @OA\Property(property="guard_name", type="string", example="api")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Permission updated successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Permission updated successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="updated-permission-name"),
+     *                 @OA\Property(property="guard_name", type="string", example="api"),
+     *                 @OA\Property(property="updated_at", type="string", format="datetime")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Permission not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Permission not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
     public function update(PermissionRequest $request, $id)
     {
         $permission = $this->permissionRepository->updatePermission($id, $request->validated());
@@ -102,6 +307,45 @@ class PermissionController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/api/v1/permissions/{id}",
+     *     tags={"Permissions"},
+     *     summary="Delete a permission",
+     *     description="Remove a permission from the system",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Permission ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Permission deleted successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Permission deleted successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Permission not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Permission not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     )
+     * )
+     */
     public function destroy($id)
     {
         $deleted = $this->permissionRepository->deletePermission($id);

@@ -22,12 +22,6 @@ use Illuminate\Support\ServiceProvider;
 use Laravel\Telescope\TelescopeServiceProvider;
 
 
-/**
- * @OA\Info(
- *     title="E-Learning",
- *     version="1.0.0"
- * )
- */
 class AppServiceProvider extends ServiceProvider
 {
     /**
