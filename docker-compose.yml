@@ -13,15 +13,35 @@ services:
         environment:
             - TZ=UTC
         depends_on:
-            - sqlite
+            - mysql
 
-    sqlite:
-        image: nouchka/sqlite3:latest
-        container_name: laravel-sqlite
-        volumes:
-            - sqlite_data:/sqlite
+    mysql:
+        image: mysql:8.0
+        container_name: learning-mysql
+        restart: unless-stopped
         environment:
-            - SQLITE_DATABASE=/sqlite/database.db
+            MYSQL_DATABASE: laravel_db
+            MYSQL_ROOT_PASSWORD: root_password
+            MYSQL_USER: laravel_user
+            MYSQL_PASSWORD: laravel_password
+        volumes:
+            - mysql_data:/var/lib/mysql
+        ports:
+            - "3307:3306"
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin:latest
+        container_name: learning-phpmyadmin
+        restart: unless-stopped
+        environment:
+            PMA_HOST: mysql
+            PMA_PORT: 3306
+            PMA_USER: root
+            PMA_PASSWORD: root_password
+        ports:
+            - "8081:80"
+        depends_on:
+            - mysql
 
 volumes:
-    sqlite_data:
+    mysql_data:
