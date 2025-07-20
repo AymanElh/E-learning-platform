@@ -18,12 +18,23 @@ class CourseResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
+            'slug' => $this->slug,
             'duration' => $this->duration,
             'difficulty' => $this->difficulty,
             'status' => $this->status,
-            'videos' =>  VideoResource::collection($this->whenLoaded('videos')),
+            'price' => $this->price,
+            'isFree' => $this->is_free,
+            'isPublished' => $this->is_published,
+            'isFeatured' => $this->is_featured,
+            'thumbnail_url' => $this->thumbnail_url,
+            'totalStudents' => $this->total_students,
+            'published_At' => $this->published_at,
+
+            // Relationships
+            'instructor' => new UserResource($this->whenLoaded('instructor')),
             'category' => new CategoryResource($this->whenLoaded('category')),
-            'tags' => TagResource::collection($this->whenLoaded('tags'))
+            'subcategory' => new CategoryResource($this->whenLoaded('subcategory')),
+            'tags' => TagResource::collection($this->whenLoaded('tags')),
         ];
     }
 }
