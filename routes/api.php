@@ -29,9 +29,9 @@ Route::prefix('v1')->group(function() {
         // Tag
         Route::get('/tags', [TagController::class, 'index']);
         Route::get('/tags/{tag}', [TagController::class, 'show']);
-        Route::middleware('permission:create tags')->post('/tags', [TagController::class, 'store']);
-        Route::middleware('permission:edit tags')->put('/tags/{tag}', [TagController::class, 'update']);
-        Route::middleware('permission:delete tags')->delete('/tags/{tag}', [TagController::class, 'destroy']);
+        Route::middleware('permission:create-tags')->post('/tags', [TagController::class, 'store']);
+        Route::middleware('permission:edit-tags')->put('/tags/{tag}', [TagController::class, 'update']);
+        Route::middleware('permission:delete-tags')->delete('/tags/{tag}', [TagController::class, 'destroy']);
 
         // Category
         Route::get('/categories', [CategoryController::class, 'index']);

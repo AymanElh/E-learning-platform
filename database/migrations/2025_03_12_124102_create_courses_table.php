@@ -14,11 +14,24 @@ return new class extends Migration
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('description')->nullable();
-            $table->integer('duration');
+            $table->text('description')->nullable();
+            $table->integer('duration'); // in minutes
             $table->enum('difficulty', ['beginner', 'intermediate', 'advanced']);
-            $table->enum('status', ['open', 'in_progress', 'completed'])->default('open');
-            $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
+            $table->enum('status', ['open', 'closed'])->default('open');
+            $table->decimal('price', 10, 2)->default('0.00');
+            $table->boolean('is_free')->default(true);
+            $table->boolean('is_published')->default(false);
+            $table->boolean('is_featured')->default(false);
+            $table->string('thumbnail_url')->nullable();
+            $table->integer('total_students')->default(0);
+
+            // Foreign keys
+            $table->foreignId('instructor_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('set null');
+            $table->foreignId('subcategory_id')->nullable()->constrained('categories')->onDelete('set null');
+
+            $table->timestamp('published_at')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

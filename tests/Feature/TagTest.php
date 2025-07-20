@@ -8,9 +8,9 @@ use Spatie\Permission\Models\Role;
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 beforeEach(function() {
-    $createPermission = Permission::firstOrCreate(['name' => 'create tags']);
-    $editPermission = Permission::firstOrCreate(['name' => 'edit tags']);
-    $deletePermission = Permission::firstOrCreate(['name' => 'delete tags']);
+    $createPermission = Permission::firstOrCreate(['name' => 'create-tags']);
+    $editPermission = Permission::firstOrCreate(['name' => 'edit-tags']);
+    $deletePermission = Permission::firstOrCreate(['name' => 'delete-tags']);
 
     $role = Role::firstOrCreate(['name' => 'admin']);
     $role->syncPermissions([$createPermission, $editPermission, $deletePermission]);
