@@ -19,7 +19,7 @@ class AuthRepository implements AuthRepositoryInterface
             'password' => $data['password']
         ];
 
-        if($data['profile_picture']) {
+        if(isset($data['profile_picture']) && $data['profile_picture']) {
             $path = $data['profile_picture']->store('profile_pictures', 'public');
             $userData['profile_picture'] = $path;
         }

@@ -39,12 +39,22 @@ class AuthController extends Controller
      *     description="Create a new user account and return authentication token",
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(
-     *             required={"name","email","password","password_confirmation"},
-     *             @OA\Property(property="name", type="string", example="John Doe"),
-     *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="password123"),
-     *             @OA\Property(property="password_confirmation", type="string", format="password", example="password123")
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"name","email","password","password_confirmation"},
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *                 @OA\Property(property="password", type="string", format="password", example="password123"),
+     *                 @OA\Property(property="password_confirmation", type="string", format="password", example="password123"),
+     *                 @OA\Property(
+     *                     property="profile_picture",
+     *                     type="string",
+     *                     format="binary",
+     *                     description="Optional profile picture file",
+     *                     nullable=true
+     *                 )
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -74,7 +84,7 @@ class AuthController extends Controller
      *     )
      * )
      */
-    public function register(RegisterRequest $request)
+    public function register(RegisterRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
             $user = $this->authRepository->register($request->validated());
@@ -84,12 +94,22 @@ class AuthController extends Controller
                     'message' => "Registration failed"
                 ], 500);
             }
+
             $token = $this->authRepository->login([
                 'email' => $request->email,
                 'password' => $request->password
             ]);
+
+            if(!$token) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Registration successful but auto-login failed"
+                ], 500);
+            }
+
             return $this->createNewToken($token);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
+            \Log::error("Registration failed: " . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => "Registration failed"
@@ -138,7 +158,7 @@ class AuthController extends Controller
      *     )
      * )
      */
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request): \Illuminate\Http\JsonResponse
     {
         $token = $this->authRepository->login($request->all());
         if(!$token) {
@@ -147,6 +167,7 @@ class AuthController extends Controller
                 'message' => "Login Failed"
             ], 401);
         }
+
         return $this->createNewToken($token);
     }
 

@@ -312,12 +312,12 @@ class CourseController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="title", type="string", example="Updated Course Title"),
-     *             @OA\Property(property="description", type="string", example="Updated course description"),
-     *             @OA\Property(property="price", type="number", format="float", example=199.99),
-     *             @OA\Property(property="category_id", type="integer", example=3),
-     *             @OA\Property(property="duration", type="integer", example=180),
-     *             @OA\Property(property="level", type="string", enum={"beginner", "intermediate", "advanced"}, example="advanced"),
+     *             @OA\Property(property="title", type="string", example="Updated Laravel Development"),
+     *             @OA\Property(property="description", type="string", example="Updated complete Laravel course"),
+     *             @OA\Property(property="price", type="number", format="float", example=119.99),
+     *             @OA\Property(property="category_id", type="integer", example=1),
+     *             @OA\Property(property="duration", type="integer", example=150),
+     *             @OA\Property(property="level", type="string", enum={"beginner", "intermediate", "advanced"}, example="intermediate"),
      *             @OA\Property(property="thumbnail", type="string", example="https://example.com/new-thumbnail.jpg")
      *         )
      *     ),
@@ -326,15 +326,25 @@ class CourseController extends Controller
      *         description="Course updated successfully",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Course updated successfully")
+     *             @OA\Property(property="message", type="string", example="Course updated successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="title", type="string", example="Updated Laravel Development"),
+     *                 @OA\Property(property="description", type="string", example="Updated complete Laravel course"),
+     *                 @OA\Property(property="price", type="number", format="float", example=119.99),
+     *                 @OA\Property(property="category_id", type="integer", example=1),
+     *                 @OA\Property(property="updated_at", type="string", format="datetime")
+     *             )
      *         )
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Course not found or not updated",
+     *         description="Course not found",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Course not found or not updated")
+     *             @OA\Property(property="message", type="string", example="Course not found")
      *         )
      *     ),
      *     @OA\Response(
@@ -391,7 +401,7 @@ class CourseController extends Controller
      *     path="/api/v1/courses/{id}",
      *     tags={"Courses"},
      *     summary="Delete a course",
-     *     description="Remove a course from the database",
+     *     description="Delete an existing course by its ID",
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="id",
@@ -410,10 +420,10 @@ class CourseController extends Controller
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Course not found or already deleted",
+     *         description="Course not found",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Course not found or already deleted")
+     *             @OA\Property(property="message", type="string", example="Course not found")
      *         )
      *     ),
      *     @OA\Response(

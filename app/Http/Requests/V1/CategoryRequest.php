@@ -22,9 +22,21 @@ class CategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required',
-            'category_id' => 'nullable',
-            'description' => 'nullable'
+            'name' => 'required|string|unique:categories,name|max:255',
+            'parent_id' => 'nullable|integer|exists:categories,id',
+            'description' => 'nullable|string|max:1000'
+        ];
+    }
+
+    /**
+     * Get custom validation messages
+     */
+    public function messages(): array
+    {
+        return [
+            'name.unique' => 'This Category name is already exist',
+            'parent_id.exists' => 'The selected parent category does not exist.',
+            'parent_id.integer' => 'The parent category ID must be a valid integer.',
         ];
     }
 }

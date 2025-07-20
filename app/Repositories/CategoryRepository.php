@@ -53,10 +53,12 @@ class CategoryRepository implements CategoryRepositoryInterface
      * @param int $id
      * @param array $data
      * @return bool
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function update(int $id, array $data): bool
     {
-        return Category::where('id', $id)->update($data);
+        $category = Category::findOrFail($id);
+        return $category->update($data);
     }
 
     /**
@@ -64,10 +66,35 @@ class CategoryRepository implements CategoryRepositoryInterface
      *
      * @param int $id
      * @return bool
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Exception
      */
     public function delete(int $id): bool
     {
-        return Category::destroy($id);
+        $category = Category::findOrFail($id);
+
+        // Check if category has children
+        if ($this->hasChildren($id)) {
+            throw new \Exception('Cannot delete category that has subcategories. Please delete or reassign subcategories first.');
+        }
+
+        // Check if category has courses
+        if ($category->courses()->count() > 0) {
+            throw new \Exception('Cannot delete category that has courses assigned to it. Please reassign courses first.');
+        }
+
+        return $category->delete();
+    }
+
+    /**
+     * Check if category has children
+     *
+     * @param int $id
+     * @return bool
+     */
+    public function hasChildren(int $id): bool
+    {
+        return Category::where('parent_id', $id)->exists();
     }
 
     /**
@@ -78,6 +105,6 @@ class CategoryRepository implements CategoryRepositoryInterface
      */
     public function getChildren(int $id): \Illuminate\Database\Eloquent\Collection
     {
-        return Category::where('category_id', $id)->get();
+        return Category::where('parent_id', $id)->get();
     }
 }

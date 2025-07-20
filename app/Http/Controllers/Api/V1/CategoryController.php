@@ -7,6 +7,7 @@ use App\Http\Requests\V1\CategoryRequest;
 use App\Http\Resources\V1\CategoryCollection;
 use App\Http\Resources\V1\CategoryResource;
 use App\Interfaces\CategoryRepositoryInterface;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
  * @OA\Tag(
@@ -110,7 +111,15 @@ class CategoryController extends Controller
      *         description="Validation error",
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string", example="The given data was invalid."),
-     *             @OA\Property(property="errors", type="object")
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="parent_id",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The selected parent category does not exist.")
+     *                 )
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -127,7 +136,6 @@ class CategoryController extends Controller
     {
         try {
             $data = $request->validated();
-            \Log::info('Validated data: ', $data);
             $this->categoryRepository->store($data);
 
             return response()->json([
@@ -138,8 +146,7 @@ class CategoryController extends Controller
             \Log::error('Error creating category: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => "Category not created",
-                'data' => $data
+                'message' => "Category not created"
             ], 500);
         }
     }
@@ -237,11 +244,27 @@ class CategoryController extends Controller
      *         )
      *     ),
      *     @OA\Response(
+     *         response=404,
+     *         description="Category not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Category not found")
+     *         )
+     *     ),
+     *     @OA\Response(
      *         response=422,
      *         description="Validation error",
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string", example="The given data was invalid."),
-     *             @OA\Property(property="errors", type="object")
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="parent_id",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The selected parent category does not exist.")
+     *                 )
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -264,6 +287,12 @@ class CategoryController extends Controller
                 'success' => true,
                 'message' => "Category updated successfully"
             ], 200);
+        } catch (ModelNotFoundException $e) {
+            \Log::error('Error updating category: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => "Category not found"
+            ], 404);
         } catch (\Exception $e) {
             \Log::error('Error updating category: ' . $e->getMessage());
             return response()->json([
@@ -321,7 +350,20 @@ class CategoryController extends Controller
                 'success' => true,
                 'message' => "Category deleted successfully"
             ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => "Category not found"
+            ], 404);
         } catch (\Exception $e) {
+            // Check if it's a business logic error (children or courses exist)
+            if (str_contains($e->getMessage(), 'Cannot delete category')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 400);
+            }
+
             \Log::error('Error deleting category: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
