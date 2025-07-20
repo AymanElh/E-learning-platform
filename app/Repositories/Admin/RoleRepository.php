@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Admin;
 
-use App\Interfaces\RoleRepositoryInterface;
+use App\Interfaces\Admin\RoleRepositoryInterface;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 

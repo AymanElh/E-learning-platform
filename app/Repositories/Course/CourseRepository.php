@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Course;
 
-use App\Interfaces\CourseRepositoryInterface;
+use App\Interfaces\Course\CourseRepositoryInterface;
 use App\Models\Course;
 
 class CourseRepository implements CourseRepositoryInterface

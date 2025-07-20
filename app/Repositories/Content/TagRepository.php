@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Content;
 
-use App\Interfaces\TagRepositoryInterface;
+use App\Interfaces\Content\TagRepositoryInterface;
 use App\Models\Tag;
 
 class TagRepository implements TagRepositoryInterface

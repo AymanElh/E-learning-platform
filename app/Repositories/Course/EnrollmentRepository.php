@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Course;
 
-use App\Interfaces\EnrollmentRepositoryInterface;
+use App\Interfaces\Course\EnrollmentRepositoryInterface;
 use App\Models\Enrollment;
 
 class EnrollmentRepository implements EnrollmentRepositoryInterface

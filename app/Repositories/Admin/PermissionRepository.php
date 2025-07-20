@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Admin;
 
-use App\Interfaces\PermissionRepositoryInterface;
-use phpDocumentor\Reflection\Types\Collection;
+use App\Interfaces\Admin\PermissionRepositoryInterface;
 use Spatie\Permission\Models\Permission;
 
 class PermissionRepository implements PermissionRepositoryInterface
