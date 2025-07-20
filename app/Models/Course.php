@@ -9,19 +9,20 @@ class Course extends Model
 {
     /** @use HasFactory<\Database\Factories\CourseFactory> */
     use HasFactory;
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array<string>
      */
     protected $fillable = [
-        'title',
-        'description',
-        'duration',
-        'difficulty',
-        'status',
-        'category_id'
+        'title', 'description', 'slug', 'duration',
+        'difficulty', 'status', 'price', 'is_free',
+        'is_published', 'is_featured', 'thumbnail_url',
+        'total_students', 'instructor_id', 'category_id',
+        'subcategory_id', 'published_at'
     ];
+
 
     /**
      * Get the category that owns the course.
@@ -39,13 +40,4 @@ class Course extends Model
         return $this->belongsToMany(Tag::class);
     }
 
-    public function enrollments()
-    {
-        return $this->hasMany(Enrollment::class);
-    }
-
-    public function videos()
-    {
-        return $this->hasMany(Video::class);
-    }
 }

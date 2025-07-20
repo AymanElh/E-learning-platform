@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
+            $table->string('slug')->unique();
             $table->integer('duration'); // in minutes
             $table->enum('difficulty', ['beginner', 'intermediate', 'advanced']);
             $table->enum('status', ['open', 'closed'])->default('open');
