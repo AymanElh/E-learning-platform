@@ -54,7 +54,7 @@ test('can fetch one category', function() {
             'data' => [
                 'id',
                 'name',
-                'categoryId',
+                'parentId',
                 'description'
             ]
         ])
@@ -99,11 +99,11 @@ test('can create a subcategory', function() {
     $data = [
         'name' => 'Smartphones',
         'description' => 'Mobile phones',
-        'category_id' => $parent->id
+        'parent_id' => $parent->id
     ];
 
     $response = $this->postJson('/api/v1/categories', $data);
-
+//    dd($response->json());
     $response->assertStatus(201)
         ->assertJson([
             'success' => true
@@ -113,7 +113,7 @@ test('can create a subcategory', function() {
 
     // Verify the relationship
     $subcategory = Category::where('name', 'Smartphones')->first();
-    expect($subcategory->category_id)->toBe($parent->id);
+    expect($subcategory->parent_id)->toBe($parent->id);
 });
 
 test('cannot create category with invalid parent', function() {

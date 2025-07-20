@@ -16,7 +16,7 @@ class AuthRepository implements AuthRepositoryInterface
         $userData = [
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => $data['password']
+            'password' => bcrypt($data['password'])
         ];
 
         if(isset($data['profile_picture']) && $data['profile_picture']) {

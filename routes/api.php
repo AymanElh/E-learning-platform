@@ -36,20 +36,20 @@ Route::prefix('v1')->group(function() {
         // Category
         Route::get('/categories', [CategoryController::class, 'index']);
         Route::get('/categories/{category}', [CategoryController::class, 'show']);
-        Route::middleware('permission:create categories')->post('/categories', [CategoryController::class, 'store']);
-        Route::middleware('permission:edit categories')->put('/categories/{category}', [CategoryController::class, 'update']);
-        Route::middleware('permission:delete categories')->delete('/categories/{category}', [CategoryController::class, 'destroy']);
+        Route::middleware('permission:create-categories')->post('/categories', [CategoryController::class, 'store']);
+        Route::middleware('permission:edit-categories')->put('/categories/{category}', [CategoryController::class, 'update']);
+        Route::middleware('permission:delete-categories')->delete('/categories/{category}', [CategoryController::class, 'destroy']);
         Route::get('/categories/{category}/children', [CategoryController::class, 'children']);
 
         // Course routes with permission checks
         Route::get('/courses', [CourseController::class, 'index']);
         Route::get('/courses/{course}', [CourseController::class, 'show']);
-        Route::middleware('permission:create courses')->post('/courses', [CourseController::class, 'store']);
-        Route::middleware('permission:edit courses')->put('/courses/{course}', [CourseController::class, 'update']);
-        Route::middleware('permission:delete courses')->delete('/courses/{course}', [CourseController::class, 'destroy']);
+        Route::middleware('permission:create-courses')->post('/courses', [CourseController::class, 'store']);
+        Route::middleware('permission:edit-courses')->put('/courses/{course}', [CourseController::class, 'update']);
+        Route::middleware('permission:delete-courses')->delete('/courses/{course}', [CourseController::class, 'destroy']);
 
         // Course tag management with permission checks
-        Route::middleware('permission:edit courses')->group(function () {
+        Route::middleware('permission:edit-courses')->group(function () {
             Route::post('/courses/{course}/tags', [CourseController::class, 'attachTags']);
             Route::put('/courses/{course}/tags', [CourseController::class, 'syncTags']);
             Route::delete('/courses/{course}/tags', [CourseController::class, 'detachTags']);
@@ -58,16 +58,16 @@ Route::prefix('v1')->group(function() {
         // Enrollment routes with permission checks
         Route::post('/courses/{course}/enroll', [EnrollmentController::class, 'enroll']);
         Route::get('/enrollments/me', [EnrollmentController::class, 'myEnrollments']);
-        Route::middleware('permission:view enrollments')->get('/courses/{course}/enrollments', [EnrollmentController::class, 'getEnrollmentsByCourse']);
-        Route::middleware('permission:approve enrollments')->put('/enrollments/{enrollment}', [EnrollmentController::class, 'updateStatus']);
-        Route::middleware('permission:delete enrollments')->delete('/enrollments/{enrollment}', [EnrollmentController::class, 'destroy']);
+        Route::middleware('permission:view-enrollments')->get('/courses/{course}/enrollments', [EnrollmentController::class, 'getEnrollmentsByCourse']);
+        Route::middleware('permission:approve-enrollments')->put('/enrollments/{enrollment}', [EnrollmentController::class, 'updateStatus']);
+        Route::middleware('permission:delete-enrollments')->delete('/enrollments/{enrollment}', [EnrollmentController::class, 'destroy']);
 
         // Course videos with permission checks
         Route::get('/courses/{course}/videos', [VideoController::class, 'index']);
         Route::get('/videos/{video}', [VideoController::class, 'show']);
-        Route::middleware('permission:create courses')->post('/courses/{course}/videos', [VideoController::class, 'store']);
-        Route::middleware('permission:edit courses')->put('/videos/{video}', [VideoController::class, 'update']);
-        Route::middleware('permission:delete courses')->delete('/videos/{video}', [VideoController::class, 'destroy']);
+        Route::middleware('permission:create-courses')->post('/courses/{course}/videos', [VideoController::class, 'store']);
+        Route::middleware('permission:edit-courses')->put('/videos/{video}', [VideoController::class, 'update']);
+        Route::middleware('permission:delete-courses')->delete('/videos/{video}', [VideoController::class, 'destroy']);
 
         // Statistics routes with permission checks
         Route::middleware('permission:view statistics')->prefix('stats')->group(function () {
