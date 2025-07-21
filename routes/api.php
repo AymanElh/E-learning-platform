@@ -1,15 +1,17 @@
 <?php
 
-use App\Http\Controllers\Api\V1\AuthController;
-use App\Http\Controllers\Api\V1\CourseController;
-use App\Http\Controllers\Api\V1\EnrollmentController;
-use App\Http\Controllers\Api\V1\PermissionController;
-use App\Http\Controllers\Api\V1\StatisticsController;
+use App\Http\Controllers\Api\V1\Admin\PermissionController;
+use App\Http\Controllers\Api\V1\Admin\RoleController;
+use App\Http\Controllers\Api\V1\Admin\StatisticsController;
+use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Content\CategoryController;
+use App\Http\Controllers\Api\V1\Content\TagController;
+use App\Http\Controllers\Api\V1\Course\CourseController;
+use App\Http\Controllers\Api\V1\Course\EnrollmentController;
+use App\Http\Controllers\Api\V1\Course\LessonController;
+use App\Http\Controllers\Api\V1\Course\SectionController;
 use App\Http\Controllers\Api\V1\VideoController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\V1\TagController;
-use App\Http\Controllers\Api\V1\CategoryController;
-use App\Http\Controllers\Api\V1\RoleController;
 
 
 Route::prefix('v1')->group(function() {
@@ -48,6 +50,23 @@ Route::prefix('v1')->group(function() {
         Route::middleware('permission:edit-courses')->put('/courses/{course}', [CourseController::class, 'update']);
         Route::middleware('permission:delete-courses')->delete('/courses/{course}', [CourseController::class, 'destroy']);
 
+        // Course Sections
+        Route::prefix('/courses/{course}')->group(function() {
+            Route::get('/sections', [SectionController::class, 'index']);
+            Route::post('/sections', [SectionController::class, 'store'])->middleware('permission:create-courses');
+            Route::put('/sections/{section}', [SectionController::class, 'update'])->middleware('permission:edit-courses');
+            Route::delete('/sections/{section}', [SectionController::class, 'destroy'])->middleware('permission:delete-courses');
+
+            // Lessons routes
+            Route::prefix('/sections/{sectionId}')->group(function() {
+                Route::apiResource('/lessons', LessonController::class);
+//                Route::get('/lessons', [LessonController::class, 'index']);
+//                Route::post('/lessons', [LessonController::class, 'store']);
+//                Route::put('/lessons/{lesson}', [LessonController::class, 'update']);
+//                Route::delete('/lessons/{lesson}', [LessonController::class, 'destroy']);
+            });
+        });
+
         // Course tag management with permission checks
         Route::middleware('permission:edit-courses')->group(function () {
             Route::post('/courses/{course}/tags', [CourseController::class, 'attachTags']);
@@ -62,12 +81,6 @@ Route::prefix('v1')->group(function() {
         Route::middleware('permission:approve-enrollments')->put('/enrollments/{enrollment}', [EnrollmentController::class, 'updateStatus']);
         Route::middleware('permission:delete-enrollments')->delete('/enrollments/{enrollment}', [EnrollmentController::class, 'destroy']);
 
-        // Course videos with permission checks
-        Route::get('/courses/{course}/videos', [VideoController::class, 'index']);
-        Route::get('/videos/{video}', [VideoController::class, 'show']);
-        Route::middleware('permission:create-courses')->post('/courses/{course}/videos', [VideoController::class, 'store']);
-        Route::middleware('permission:edit-courses')->put('/videos/{video}', [VideoController::class, 'update']);
-        Route::middleware('permission:delete-courses')->delete('/videos/{video}', [VideoController::class, 'destroy']);
 
         // Statistics routes with permission checks
         Route::middleware('permission:view statistics')->prefix('stats')->group(function () {

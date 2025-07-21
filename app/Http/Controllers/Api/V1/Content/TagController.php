@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\Api\V1\Content;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\V1\TagRequest;
-use App\Http\Resources\V1\TagCollection;
-use App\Http\Resources\V1\TagResource;
-use App\Interfaces\TagRepositoryInterface;
+use App\Http\Requests\V1\Content\TagRequest;
+use App\Http\Resources\V1\Content\TagCollection;
+use App\Http\Resources\V1\Content\TagResource;
+use App\Interfaces\Content\TagRepositoryInterface;
 
 /**
  * @OA\Tag(

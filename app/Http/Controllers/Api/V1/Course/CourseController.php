@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\Api\V1\Course;
 
+use App\Http\Controllers\Api\V1\Response;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\V1\CourseRequest;
-use App\Http\Requests\V1\CourseTagsRequest;
-use App\Http\Resources\V1\CourseCollection;
-use App\Http\Resources\V1\CourseResource;
-use App\Repositories\CourseRepository;
+use App\Http\Requests\V1\Content\CourseTagsRequest;
+use App\Http\Requests\V1\Course\CourseRequest;
+use App\Http\Resources\V1\Course\CourseCollection;
+use App\Http\Resources\V1\Course\CourseResource;
+use App\Repositories\Course\CourseRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
@@ -183,9 +184,9 @@ class CourseController extends Controller
      */
     public function store(CourseRequest $request): JsonResponse
     {
-        $data = $request->validated();
 
         try {
+            $data = $request->validated();
             $course = $this->courseRepository->store($data);
             return response()->json([
                 'success' => true,

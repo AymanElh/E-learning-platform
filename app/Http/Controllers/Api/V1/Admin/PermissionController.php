@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\PermissionRequest;
-use App\Interfaces\PermissionRepositoryInterface;
-use App\Repositories\PermissionRepository;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use App\Http\Requests\V1\Admin\PermissionRequest;
+use App\Interfaces\Admin\PermissionRepositoryInterface;
+use App\Repositories\Admin\PermissionRepository;
 use Mockery\Exception;
+use function App\Http\Controllers\Api\V1\json;
 
 /**
  * @OA\Tag(
@@ -23,7 +22,7 @@ class PermissionController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param  \App\Interfaces\PermissionRepositoryInterface  $permissionRepository
+     * @param  \App\Interfaces\Admin\PermissionRepositoryInterface  $permissionRepository
      * @return void
      */
     public function __construct(PermissionRepositoryInterface $permissionRepository)

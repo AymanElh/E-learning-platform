@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\Api\V1\Course;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\V1\EnrollmentCollection;
-use App\Http\Resources\V1\EnrollmentResource;
-use App\Interfaces\EnrollmentRepositoryInterface;
+use App\Http\Resources\V1\Course\EnrollmentCollection;
+use App\Http\Resources\V1\Course\EnrollmentResource;
+use App\Interfaces\Course\EnrollmentRepositoryInterface;
 use Illuminate\Http\Request;
 
 /**

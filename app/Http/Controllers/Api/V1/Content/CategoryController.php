@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\Api\V1\Content;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\V1\CategoryRequest;
-use App\Http\Resources\V1\CategoryCollection;
-use App\Http\Resources\V1\CategoryResource;
-use App\Interfaces\CategoryRepositoryInterface;
+use App\Http\Requests\V1\Content\CategoryRequest;
+use App\Http\Resources\V1\Content\CategoryCollection;
+use App\Http\Resources\V1\Content\CategoryResource;
+use App\Interfaces\Content\CategoryRepositoryInterface;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**

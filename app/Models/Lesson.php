@@ -9,7 +9,7 @@ class Lesson extends Model
 {
 
     protected $fillable = [
-        'section_id', 'title', 'description', 'lesson_type',
+        'course_id', 'section_id', 'title', 'description', 'lesson_type',
         'order_index', 'duration_minutes', 'is_free_preview', 'is_published'
     ];
 
@@ -19,6 +19,11 @@ class Lesson extends Model
     public function section(): BelongsTo
     {
         return $this->belongsTo(Section::class);
+    }
+
+    public function course(): BelongsTo
+    {
+        return $this->belongsTo(Course::class);
     }
 
     public function getCourseAttribute()

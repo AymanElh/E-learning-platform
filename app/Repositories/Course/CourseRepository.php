@@ -4,6 +4,8 @@ namespace App\Repositories\Course;
 
 use App\Interfaces\Course\CourseRepositoryInterface;
 use App\Models\Course;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class CourseRepository implements CourseRepositoryInterface
 {
@@ -14,7 +16,7 @@ class CourseRepository implements CourseRepositoryInterface
      */
     public function getAll(): \Illuminate\Database\Eloquent\Collection
     {
-        return Course::with(['videos', 'category', 'tags'])->get();
+        return Course::with(['sections', 'lessons', 'category', 'tags'])->get();
     }
 
     /**
@@ -25,7 +27,7 @@ class CourseRepository implements CourseRepositoryInterface
      */
     public function getById(int $id): ?Course
     {
-        return Course::with(['category', 'tags'])->find($id);
+        return Course::with(['category', 'tags', 'sections.lessons'])->find($id);
     }
 
     /**
@@ -39,10 +41,18 @@ class CourseRepository implements CourseRepositoryInterface
         $course = Course::create([
             'title' => $data['title'],
             'description' => $data['description'] ?? null,
+            'slug' => Str::slug($data['title']),
             'duration' => $data['duration'],
             'difficulty' => $data['difficulty'],
             'status' => $data['status'] ?? 'open',
+            'price' => $data['price'],
+            'is_free' => $data['is_free'],
+            'is_featured' => $data['is_featured'],
+            'thumbnail_url' => $data['thumbnail_url'],
+            'instructor_id' => $data['instructor_id'],
             'category_id' => $data['category_id'],
+            'subcategory_id' => $data['subcategory_id'],
+            'published_at' => now(),
         ]);
 
         // Sync tags if provided
@@ -68,14 +78,31 @@ class CourseRepository implements CourseRepositoryInterface
             return null;
         }
 
-        $course->update([
+        $updateData = [
             'title' => $data['title'] ?? $course->title,
             'description' => $data['description'] ?? $course->description,
             'duration' => $data['duration'] ?? $course->duration,
             'difficulty' => $data['difficulty'] ?? $course->difficulty,
             'status' => $data['status'] ?? $course->status,
+            'price' => $data['price'] ?? $course->price,
+            'is_free' => $data['is_free'] ?? $course->is_free,
+            'is_published' => $data['is_published'] ?? $course->is_published,
+            'is_featured' => $data['is_featured'] ?? $course->is_featured,
+            'thumbnail_url' => $data['thumbnail_url'] ?? $course->thumbnail_url,
+            'instructor_id' => $data['instructor_id'] ?? $course->instructor_id,
             'category_id' => $data['category_id'] ?? $course->category_id,
-        ]);
+            'subcategory_id' => $data['subcategory_id'] ?? $course->subcategory_id,
+            'published_at' => $data['published_at'] ?? $course->published_at,
+        ];
+
+        // Handle slug update if title is provided
+        if (isset($data['title'])) {
+            $updateData['slug'] = isset($data['slug']) ? $data['slug'] : Str::slug($data['title']);
+        } elseif (isset($data['slug'])) {
+            $updateData['slug'] = $data['slug'];
+        }
+
+        $course->update($updateData);
 
         // Sync tags if provided
         if (isset($data['tags']) && is_array($data['tags'])) {
@@ -138,7 +165,7 @@ class CourseRepository implements CourseRepositoryInterface
         }
 
         foreach ($tagIds as $tagId) {
-            \DB::table('course_tag')
+            DB::table('course_tag')
                 ->where('course_id', $course->id)
                 ->where('tag_id', $tagId)
                 ->delete();

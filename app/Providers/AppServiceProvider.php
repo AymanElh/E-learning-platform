@@ -2,21 +2,24 @@
 
 namespace App\Providers;
 
-use App\Interfaces\AuthRepositoryInterface;
-use App\Interfaces\CategoryRepositoryInterface;
-use App\Interfaces\CourseRepositoryInterface;
-use App\Interfaces\EnrollmentRepositoryInterface;
-use App\Interfaces\PermissionRepositoryInterface;
-use App\Interfaces\RoleRepositoryInterface;
-use App\Interfaces\TagRepositoryInterface;
-use App\Models\Enrollment;
-use App\Repositories\AuthRepository;
-use App\Repositories\CategoryRepository;
-use App\Repositories\CourseRepository;
-use App\Repositories\EnrollmentRepository;
-use App\Repositories\PermissionRepository;
-use App\Repositories\RoleRepository;
-use App\Repositories\TagRepository;
+use App\Interfaces\Admin\PermissionRepositoryInterface;
+use App\Interfaces\Admin\RoleRepositoryInterface;
+use App\Interfaces\Auth\AuthRepositoryInterface;
+use App\Interfaces\Content\CategoryRepositoryInterface;
+use App\Interfaces\Content\TagRepositoryInterface;
+use App\Interfaces\Course\CourseRepositoryInterface;
+use App\Interfaces\Course\EnrollmentRepositoryInterface;
+use App\Interfaces\Course\LessonRepositoryInterface;
+use App\Interfaces\Course\SectionRepositoryInterface;
+use App\Repositories\Admin\PermissionRepository;
+use App\Repositories\Admin\RoleRepository;
+use App\Repositories\Auth\AuthRepository;
+use App\Repositories\Content\CategoryRepository;
+use App\Repositories\Content\TagRepository;
+use App\Repositories\Course\CourseRepository;
+use App\Repositories\Course\EnrollmentRepository;
+use App\Repositories\Course\SectionRepository;
+use App\Repositories\Course\LessonRepository;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Telescope\TelescopeServiceProvider;
@@ -36,6 +39,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(EnrollmentRepositoryInterface::class, Enrollmentrepository::class);
         $this->app->bind(RoleRepositoryInterface::class, RoleRepository::class);
         $this->app->bind(PermissionRepositoryInterface::class, PermissionRepository::class);
+        $this->app->bind(SectionRepositoryInterface::class, SectionRepository::class);
+        $this->app->bind(LessonRepositoryInterface::class, LessonRepository::class);
+
         if ($this->app->environment('local') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);

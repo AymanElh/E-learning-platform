@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\V1\RoleRequest;
-use App\Interfaces\RoleRepositoryInterface;
-use App\Repositories\RoleRepository;
+use App\Http\Requests\V1\Admin\RoleRequest;
+use App\Interfaces\Admin\RoleRepositoryInterface;
+use App\Repositories\Admin\RoleRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 /**
  * @OA\Tag(
@@ -23,7 +22,7 @@ class RoleController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param  \App\Interfaces\RoleRepositoryInterface  $roleRepository
+     * @param  \App\Interfaces\Admin\RoleRepositoryInterface  $roleRepository
      * @return void
      */
     public function __construct(RoleRepositoryInterface $roleRepository)
