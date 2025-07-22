@@ -7,6 +7,7 @@ use App\Http\Resources\V1\Course\EnrollmentCollection;
 use App\Http\Resources\V1\Course\EnrollmentResource;
 use App\Interfaces\Course\EnrollmentRepositoryInterface;
 use App\Models\Course;
+use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -18,6 +19,8 @@ use Illuminate\Http\Request;
  */
 class EnrollmentController extends Controller
 {
+    use ApiResponse;
+
     public EnrollmentRepositoryInterface $enrollmentRepository;
 
     /**
@@ -101,28 +104,23 @@ class EnrollmentController extends Controller
      */
     public function enroll(Course $course): JsonResponse
     {
-        $userId = auth()->id();
-        $enrollment = $this->enrollmentRepository->enroll($course, $userId);
+        try {
+            $userId = auth()->id();
+            $enrollment = $this->enrollmentRepository->enroll($course, $userId);
 
-        if ($enrollment === false) {
-            return response()->json([
-                'success' => false,
-                'message' => "User is already enrolled in this course."
-            ], 409); // More accurate than 400
+            if ($enrollment === false) {
+                return $this->errorResponse("User is already enrolled this course", null, 409);
+            }
+
+            if ($enrollment === null) {
+                return $this->errorResponse("An error occurred while enrolling.", null, 500);c
+            }
+
+            return $this->successResponse("Course Enrolled successfully", new EnrollmentResource($enrollment), 201);
+        } catch (\Exception $e) {
+            \Log::error("Error enrolling this course: ", $e->getMessage());
+            return $this->errorResponse("Error enrolling this course", null, 500);
         }
-
-        if ($enrollment === null) {
-            return response()->json([
-                'success' => false,
-                'message' => "An error occurred while enrolling."
-            ], 500);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => "Course enrolled successfully",
-            'data' => new EnrollmentResource($enrollment)
-        ], 201);
     }
 
     /**

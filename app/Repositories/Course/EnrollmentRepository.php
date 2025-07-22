@@ -10,22 +10,17 @@ class EnrollmentRepository implements EnrollmentRepositoryInterface
 {
     public function enroll(\App\Models\Course $course, int $userId): Enrollment|false|null
     {
-        try {
-            $alreadyEnrolled = $course->enrollments()->where('user_id', $userId)->exists();
+        $alreadyEnrolled = $course->enrollments()->where('user_id', $userId)->exists();
 
-            if($alreadyEnrolled) {
-                return false;
-            }
-
-            return Enrollment::create([
-                'user_id' => $userId,
-                'course_id' => $course->id,
-                'status' => "pending"
-            ]);
-        } catch (\Exception $e) {
-            \Log::error("Error creating a new enrollment: " . $e->getMessage());
-            return null;
+        if ($alreadyEnrolled) {
+            return false;
         }
+
+        return Enrollment::create([
+            'user_id' => $userId,
+            'course_id' => $course->id,
+            'status' => "pending"
+        ]);
     }
 
     public function getEnrollmentByCourse(int $courseId)
@@ -46,7 +41,7 @@ class EnrollmentRepository implements EnrollmentRepositoryInterface
     public function updateStatus(int $id, string $status)
     {
         $enrollment = Enrollment::find($id);
-        if(!$enrollment) {
+        if (!$enrollment) {
             return null;
         }
 
@@ -57,7 +52,7 @@ class EnrollmentRepository implements EnrollmentRepositoryInterface
     public function delete(int $id)
     {
         $enrollment = Enrollment::find($id);
-        if(!$enrollment) {
+        if (!$enrollment) {
             return false;
         }
         return $enrollment->delete();
