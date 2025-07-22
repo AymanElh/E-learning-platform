@@ -15,9 +15,9 @@ class SectionRepository implements SectionRepositoryInterface
         return Section::with(['course', 'lessons'])->orderBy('order_index')->get();
     }
 
-    public function getById(int $id): Section
+    public function getById(Course $course, int $id): ?object
     {
-        return Section::with(['course', 'lessons'])->find($id);
+        return $course->sections()->findOrFail($id);
     }
 
     public function getByCourse(int $course_id): Collection
@@ -30,7 +30,7 @@ class SectionRepository implements SectionRepositoryInterface
     public function store(array $data): Section
     {
         $nextOrderIdx = Section::where('course_id', $data['course_id'])->max('order_index');
-        $data['order_index'] = $nextOrderIdx ?? 0;
+        $data['order_index'] = $data['order_index'] ?? $nextOrderIdx ?? 0;
 
         $section = Section::create($data);
         return $section->load(['course', 'lessons']);

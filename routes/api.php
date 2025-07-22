@@ -54,17 +54,12 @@ Route::prefix('v1')->group(function() {
         Route::prefix('/courses/{course}')->group(function() {
             Route::get('/sections', [SectionController::class, 'index']);
             Route::post('/sections', [SectionController::class, 'store'])->middleware('permission:create-courses');
+            Route::get('/sections/{section}', [SectionController::class, 'show']);
             Route::put('/sections/{section}', [SectionController::class, 'update'])->middleware('permission:edit-courses');
             Route::delete('/sections/{section}', [SectionController::class, 'destroy'])->middleware('permission:delete-courses');
 
             // Lessons routes
-            Route::prefix('/sections/{sectionId}')->group(function() {
-                Route::apiResource('/lessons', LessonController::class);
-//                Route::get('/lessons', [LessonController::class, 'index']);
-//                Route::post('/lessons', [LessonController::class, 'store']);
-//                Route::put('/lessons/{lesson}', [LessonController::class, 'update']);
-//                Route::delete('/lessons/{lesson}', [LessonController::class, 'destroy']);
-            });
+            Route::apiResource('/sections/{sectionId}/lessons', LessonController::class);
         });
 
         // Course tag management with permission checks

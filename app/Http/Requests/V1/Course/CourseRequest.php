@@ -24,8 +24,8 @@ class CourseRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'slug' => 'required|string|max:255|unique:courses,slug,' . $this->route('course'),
-            'duration' => 'required|integer|min:1',
+            'slug' => 'sometimes|string|max:255|unique:courses,slug,' . $this->route('course'),
+            'duration' => 'nullable|integer|min:1',
             'difficulty' => 'required|in:beginner,intermediate,advanced',
             'status' => 'nullable|in:open,closed',
             'price' => 'nullable|numeric|min:0',

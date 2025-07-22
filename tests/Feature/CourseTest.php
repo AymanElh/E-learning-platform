@@ -14,11 +14,11 @@ beforeEach(function() {
     $editPermission = Permission::firstOrCreate(['name' => 'edit-courses']);
     $deletePermission = Permission::firstOrCreate(['name' => 'delete-courses']);
 
-    $role = Role::firstOrCreate(['name' => 'mentor']);
+    $role = Role::firstOrCreate(['name' => 'instructor']);
     $role->syncPermissions([$createPermission, $editPermission, $deletePermission]);
 
     $this->user = User::factory()->create();
-    $this->user->assignRole('mentor');
+    $this->user->assignRole('instructor');
 
     $this->token = auth()->login($this->user);
 
@@ -109,7 +109,13 @@ test('can create a course', function() {
         'duration' => 120,
         'difficulty' => 'intermediate',
         'status' => 'open',
+        'price' => 99.99,
+        'is_free' => false,
+        'is_featured' => true,
+        'thumbnail_url' => 'https://example.com/thumbnail.jpg',
+        'instructor_id' => $this->user->id,
         'category_id' => $category->id,
+        'subcategory_id' => null,
         'tags' => $tags->pluck('id')->toArray()
     ];
 
@@ -126,6 +132,11 @@ test('can create a course', function() {
         'description' => 'Learn advanced Laravel concepts',
         'duration' => 120,
         'difficulty' => 'intermediate',
+        'price' => 99.99,
+        'is_free' => false,
+        'is_featured' => true,
+        'thumbnail_url' => 'https://example.com/thumbnail.jpg',
+        'instructor_id' => $this->user->id
     ]);
 
     // Get the created course ID
@@ -149,7 +160,8 @@ test('can update course', function() {
 
     // Create a course
     $course = Course::factory()->create([
-        'category_id' => $category->id
+        'category_id' => $category->id,
+        'instructor_id' => $this->user->id
     ]);
 
     // Attach initial tags
@@ -160,7 +172,12 @@ test('can update course', function() {
         'description' => 'Updated description',
         'duration' => 150,
         'difficulty' => 'advanced',
-        'status' => 'in_progress',
+        'status' => 'open',
+        'price' => 149.99,
+        'is_free' => false,
+        'is_featured' => false,
+        'thumbnail_url' => 'https://example.com/new-thumbnail.jpg',
+        'instructor_id' => $this->user->id,
         'category_id' => $newCategory->id,
         'tags' => $newTags->pluck('id')->toArray()
     ];
@@ -180,7 +197,11 @@ test('can update course', function() {
         'description' => 'Updated description',
         'duration' => 150,
         'difficulty' => 'advanced',
-        'status' => 'in_progress',
+        'status' => 'open',
+        'price' => 149.99,
+        'is_free' => false,
+        'is_featured' => false,
+        'thumbnail_url' => 'https://example.com/new-thumbnail.jpg',
         'category_id' => $newCategory->id
     ]);
 
@@ -238,7 +259,7 @@ test('validate required fields when creating course', function() {
     $response = $this->postJson('/api/v1/courses', []);
 
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['title', 'duration', 'difficulty', 'category_id']);
+        ->assertJsonValidationErrors(['title', 'difficulty', 'category_id']);
 });
 
 test('validate course difficulty must be valid', function() {
@@ -296,3 +317,69 @@ test('validate tags must exist', function() {
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['tags.0', 'tags.1']);
 });
+
+test('validate price must be numeric when provided', function() {
+    $category = Category::factory()->create();
+
+    $response = $this->postJson('/api/v1/courses', [
+        'title' => 'New Course',
+        'duration' => 100,
+        'difficulty' => 'beginner',
+        'category_id' => $category->id,
+        'price' => 'invalid_price'
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['price']);
+});
+
+test('validate instructor_id must exist when provided', function() {
+    $category = Category::factory()->create();
+
+    $response = $this->postJson('/api/v1/courses', [
+        'title' => 'New Course',
+        'duration' => 100,
+        'difficulty' => 'beginner',
+        'category_id' => $category->id,
+        'instructor_id' => 9999  // Non-existent user
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['instructor_id']);
+});
+
+test('can create free course', function() {
+    $category = Category::factory()->create();
+    $tags = Tag::factory(2)->create();
+
+    $data = [
+        'title' => 'Free Laravel Course',
+        'description' => 'A completely free Laravel course',
+        'slug' => 'free-laravel-course',
+        'duration' => 60,
+        'difficulty' => 'beginner',
+        'status' => 'open',
+        'price' => 0,
+        'is_free' => true,
+        'is_featured' => false,
+        'instructor_id' => $this->user->id,
+        'thumbnail_url' => 'https://example.com/thumbnail.jpg',
+        'category_id' => $category->id,
+        'tags' => $tags->pluck('id')->toArray()
+    ];
+
+    $response = $this->postJson('/api/v1/courses', $data);
+    $response->assertStatus(201)
+        ->assertJson([
+            'success' => true,
+            'message' => "Course created successfully"
+        ]);
+
+    $this->assertDatabaseHas('courses', [
+        'title' => 'Free Laravel Course',
+        'price' => 0,
+        'is_free' => true,
+        'is_featured' => false
+    ]);
+});
+

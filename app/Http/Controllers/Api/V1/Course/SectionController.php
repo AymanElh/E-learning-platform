@@ -8,6 +8,7 @@ use App\Http\Resources\V1\Course\SectionResource;
 use App\Interfaces\Course\SectionRepositoryInterface;
 use App\Models\Course;
 use App\Repositories\Course\SectionRepository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 
@@ -62,7 +63,7 @@ class SectionController extends Controller
     public function update(SectionRequest $request, Course $course, int $sectionId): JsonResponse
     {
         try {
-            $section = $this->sectionRepository->getById($sectionId);
+            $section = $this->sectionRepository->getById($course, $sectionId);
 
             if (!$section || $section->course_id !== $course->id) {
                 return response()->json([
@@ -89,45 +90,47 @@ class SectionController extends Controller
 
     public function show(Course $course, int $sectionId): JsonResponse
     {
-        $section = $this->sectionRepository->getById($sectionId);
+        try {
+            $section = $this->sectionRepository->getById($course, $sectionId);
 
-        if (!$section || $section->course_id !== $course->id) {
+            return response()->json([
+                'success' => true,
+                'data' => new SectionResource($section)
+            ]);
+        } catch (ModelNotFoundException $e) {
+            \Log::error("Section not found on this course: " . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Section not found'
+                'message' => "Section not found on this course",
             ], 404);
         }
-
-        return response()->json([
-            'success' => true,
-            'data' => new SectionResource($section)
-        ]);
     }
 
     public function destroy(Course $course, int $sectionId): JsonResponse
     {
-        $section = $this->sectionRepository->getById($sectionId);
+        try {
+            $section = $this->sectionRepository->getById($course, $sectionId);
 
-        if (!$section || $section->course_id !== $course->id) {
+            // Check if section has lessons
+            if ($section->lessons()->count() > 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot delete section with lessons. Please delete lessons first.'
+                ], 422);
+            }
+
+            $this->sectionRepository->delete($section->id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Section deleted successfully'
+            ]);
+        } catch (ModelNotFoundException $e) {
+            \Log::error("Section not found on this lesson: " . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Section not found'
+                'message' => 'Section not found on this course'
             ], 404);
         }
-
-        // Check if section has lessons
-        if ($section->lessons()->count() > 0) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cannot delete section with lessons. Please delete lessons first.'
-            ], 422);
-        }
-
-        $this->sectionRepository->delete($sectionId);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Section deleted successfully'
-        ]);
     }
 }
