@@ -4,21 +4,22 @@ namespace App\Repositories\Course;
 
 use App\Interfaces\Course\EnrollmentRepositoryInterface;
 use App\Models\Enrollment;
+use Illuminate\Http\JsonResponse;
 
 class EnrollmentRepository implements EnrollmentRepositoryInterface
 {
-    public function enroll(int $userId, int $courseId)
+    public function enroll(\App\Models\Course $course, int $userId): Enrollment|false|null
     {
         try {
-            $isExist = Enrollment::where('user_id', $userId)->where('course_id', $courseId)->first();
+            $alreadyEnrolled = $course->enrollments()->where('user_id', $userId)->exists();
 
-            if($isExist) {
+            if($alreadyEnrolled) {
                 return false;
             }
 
             return Enrollment::create([
                 'user_id' => $userId,
-                'course_id' => $courseId,
+                'course_id' => $course->id,
                 'status' => "pending"
             ]);
         } catch (\Exception $e) {

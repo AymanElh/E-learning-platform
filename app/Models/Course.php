@@ -42,14 +42,27 @@ class Course extends Model
         return $this->belongsToMany(Tag::class);
     }
 
+    /**
+     * Get the section for the course, ordered by their index
+     */
     public function sections(): HasMany
     {
         return $this->hasMany(Section::class)->orderBy('order_index');
     }
 
+    /**
+     * Get all lessons for the course through its sections.
+     */
     public function lessons(): HasManyThrough
     {
         return $this->hasManyThrough(Lesson::class, Section::class);
     }
 
+    /**
+     * Get course enrollments.
+     */
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(Enrollment::class);
+    }
 }

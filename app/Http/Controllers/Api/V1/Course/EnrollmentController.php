@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\Course\EnrollmentCollection;
 use App\Http\Resources\V1\Course\EnrollmentResource;
 use App\Interfaces\Course\EnrollmentRepositoryInterface;
+use App\Models\Course;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
@@ -97,16 +99,23 @@ class EnrollmentController extends Controller
      *     )
      * )
      */
-    public function enroll(Request $request, int $courseId)
+    public function enroll(Course $course): JsonResponse
     {
         $userId = auth()->id();
-        $enrollment = $this->enrollmentRepository->enroll($userId, $courseId);
+        $enrollment = $this->enrollmentRepository->enroll($course, $userId);
 
-        if (!$enrollment) {
+        if ($enrollment === false) {
             return response()->json([
                 'success' => false,
-                'message' => "This enrollment is already exist"
-            ], 400);
+                'message' => "User is already enrolled in this course."
+            ], 409); // More accurate than 400
+        }
+
+        if ($enrollment === null) {
+            return response()->json([
+                'success' => false,
+                'message' => "An error occurred while enrolling."
+            ], 500);
         }
 
         return response()->json([

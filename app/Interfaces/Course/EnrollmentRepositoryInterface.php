@@ -2,9 +2,10 @@
 
 namespace App\Interfaces\Course;
 
+
 interface EnrollmentRepositoryInterface
 {
-    public function enroll(int $userId, int $courseId);
+    public function enroll(\App\Models\Course $course, int $userId);
     public function getEnrollmentByCourse(int $courseId);
     public function getEnrollmentByUser(int $userId);
     public function getById(int $id);
