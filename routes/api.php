@@ -10,9 +10,12 @@ use App\Http\Controllers\Api\V1\Course\CourseController;
 use App\Http\Controllers\Api\V1\Course\EnrollmentController;
 use App\Http\Controllers\Api\V1\Course\LessonController;
 use App\Http\Controllers\Api\V1\Course\SectionController;
-use App\Http\Controllers\Api\V1\VideoController;
 use Illuminate\Support\Facades\Route;
 
+
+Route::get('/test', function() {
+    throw new \Illuminate\Database\Eloquent\ModelNotFoundException("Test model not found");
+});
 
 Route::prefix('v1')->group(function() {
     // public routes
@@ -70,11 +73,13 @@ Route::prefix('v1')->group(function() {
         });
 
         // Enrollment routes with permission checks
-        Route::post('/courses/{course}/enroll', [EnrollmentController::class, 'enroll']);
+        Route::prefix('/courses/{course}')->group(function() {
+            Route::post('/enroll', [EnrollmentController::class, 'enroll']);
+            Route::patch('/enrollments/{enrollment}', [EnrollmentController::class, 'updateStatus'])->middleware('role:admin|instructor');
+            Route::get('/enrollments', [EnrollmentController::class, 'getEnrollmentsByCourse'])->middleware('role:instructor');
+        });
         Route::get('/enrollments/me', [EnrollmentController::class, 'myEnrollments']);
-        Route::middleware('permission:view-enrollments')->get('/courses/{course}/enrollments', [EnrollmentController::class, 'getEnrollmentsByCourse']);
-        Route::middleware('permission:approve-enrollments')->put('/enrollments/{enrollment}', [EnrollmentController::class, 'updateStatus']);
-        Route::middleware('permission:delete-enrollments')->delete('/enrollments/{enrollment}', [EnrollmentController::class, 'destroy']);
+        Route::delete('/enrollments/{enrollment}', [EnrollmentController::class, 'destroy']);
 
 
         // Statistics routes with permission checks

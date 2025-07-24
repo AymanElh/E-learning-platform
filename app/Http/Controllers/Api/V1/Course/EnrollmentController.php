@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\Api\V1\Course;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\V1\Course\UpdateEnrollmentStatusRequest;
 use App\Http\Resources\V1\Course\EnrollmentCollection;
 use App\Http\Resources\V1\Course\EnrollmentResource;
 use App\Interfaces\Course\EnrollmentRepositoryInterface;
 use App\Models\Course;
 use App\Traits\ApiResponse;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 /**
  * @OA\Tag(
@@ -113,7 +116,7 @@ class EnrollmentController extends Controller
             }
 
             if ($enrollment === null) {
-                return $this->errorResponse("An error occurred while enrolling.", null, 500);c
+                return $this->errorResponse("An error occurred while enrolling.", null, 500);
             }
 
             return $this->successResponse("Course Enrolled successfully", new EnrollmentResource($enrollment), 201);
@@ -123,257 +126,32 @@ class EnrollmentController extends Controller
         }
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/v1/enrollments",
-     *     tags={"Enrollments"},
-     *     summary="Get user enrollments",
-     *     description="Retrieve all enrollments for the authenticated user",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Parameter(
-     *         name="status",
-     *         in="query",
-     *         description="Filter enrollments by status",
-     *         required=false,
-     *         @OA\Schema(type="string", enum={"in_progress", "completed", "cancelled"}, example="in_progress")
-     *     ),
-     *     @OA\Parameter(
-     *         name="page",
-     *         in="query",
-     *         description="Page number for pagination",
-     *         required=false,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Enrollments retrieved successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Enrollments retrieved successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(
-     *                     property="data",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         type="object",
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="user_id", type="integer", example=1),
-     *                         @OA\Property(property="course_id", type="integer", example=1),
-     *                         @OA\Property(property="status", type="string", example="in_progress"),
-     *                         @OA\Property(property="enrolled_at", type="string", format="datetime"),
-     *                         @OA\Property(property="completed_at", type="string", format="datetime", nullable=true),
-     *                         @OA\Property(
-     *                             property="course",
-     *                             type="object",
-     *                             @OA\Property(property="id", type="integer", example=1),
-     *                             @OA\Property(property="title", type="string", example="Laravel Development"),
-     *                             @OA\Property(property="description", type="string", example="Complete Laravel course")
-     *                         )
-     *                     )
-     *                 ),
-     *                 @OA\Property(
-     *                     property="meta",
-     *                     type="object",
-     *                     @OA\Property(property="current_page", type="integer", example=1),
-     *                     @OA\Property(property="last_page", type="integer", example=3),
-     *                     @OA\Property(property="per_page", type="integer", example=15),
-     *                     @OA\Property(property="total", type="integer", example=42)
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
-     *         )
-     *     )
-     * )
-     */
-    public function index(Request $request)
+    public function updateStatus(Course $course, int $enrollmentId, UpdateEnrollmentStatusRequest $request): JsonResponse
     {
-        $userId = auth()->id();
-        $enrollments = $this->enrollmentRepository->getUserEnrollments($userId, $request->query('status'));
+        try {
+            $data = $request->validated();
+            $this->enrollmentRepository->updateStatus($course, $enrollmentId, $data['status']);
 
-        return response()->json([
-            'success' => true,
-            'message' => "Enrollments retrieved successfully",
-            'data' => new EnrollmentCollection($enrollments)
-        ]);
+            return $this->successResponse("Enrollment status updated successfully");
+        } catch (ModelNotFoundException $e) {
+            \Log::error("Enrollment not found: " . $e->getMessage());
+            return $this->notFoundResponse("Enrollment not found on this course");
+        } catch (\Exception $e) {
+            \Log::error("Error updating the status of course: " . $e->getMessage());
+            return $this->errorResponse("Error updating the status of the course");
+        }
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/v1/enrollments/{id}",
-     *     tags={"Enrollments"},
-     *     summary="Get enrollment details",
-     *     description="Retrieve detailed information about a specific enrollment",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="Enrollment ID",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Enrollment details retrieved successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Enrollment details retrieved successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="user_id", type="integer", example=1),
-     *                 @OA\Property(property="course_id", type="integer", example=1),
-     *                 @OA\Property(property="status", type="string", example="in_progress"),
-     *                 @OA\Property(property="enrolled_at", type="string", format="datetime"),
-     *                 @OA\Property(property="completed_at", type="string", format="datetime", nullable=true),
-     *                 @OA\Property(property="progress_percentage", type="integer", example=75),
-     *                 @OA\Property(
-     *                     property="course",
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="title", type="string", example="Laravel Development"),
-     *                     @OA\Property(property="description", type="string", example="Complete Laravel course"),
-     *                     @OA\Property(property="duration", type="integer", example=120)
-     *                 ),
-     *                 @OA\Property(
-     *                     property="user",
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="name", type="string", example="John Doe"),
-     *                     @OA\Property(property="email", type="string", example="john@example.com")
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Enrollment not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Enrollment not found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=403,
-     *         description="Unauthorized to view this enrollment",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Unauthorized to view this enrollment")
-     *         )
-     *     )
-     * )
-     */
-    public function show(int $id)
+    public function getEnrollmentsByCourse(Course $course): JsonResponse
     {
-        $enrollment = $this->enrollmentRepository->getById($id);
+        try {
+            $enrollments = $this->enrollmentRepository->getEnrollmentByCourse($course);
 
-        if (!$enrollment) {
-            return response()->json([
-                'success' => false,
-                'message' => "Enrollment not found"
-            ], 404);
+            return $this->successResponse("Enrollments got successfully", new EnrollmentCollection($enrollments));
+        } catch(\Exception $e) {
+            \Log::error("Error getting enrollments: " . $e->getMessage());
+            return $this->errorResponse("Error getting enrollments");
         }
-
-        // Check if user owns this enrollment
-        if ($enrollment->user_id !== auth()->id()) {
-            return response()->json([
-                'success' => false,
-                'message' => "Unauthorized to view this enrollment"
-            ], 403);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => "Enrollment details retrieved successfully",
-            'data' => new EnrollmentResource($enrollment)
-        ]);
-    }
-
-    /**
-     * @OA\Put(
-     *     path="/api/v1/enrollments/{id}/complete",
-     *     tags={"Enrollments"},
-     *     summary="Mark enrollment as completed",
-     *     description="Update enrollment status to completed",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="Enrollment ID",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Enrollment marked as completed",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Enrollment marked as completed"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="status", type="string", example="completed"),
-     *                 @OA\Property(property="completed_at", type="string", format="datetime")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Enrollment not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Enrollment not found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=403,
-     *         description="Unauthorized to update this enrollment",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Unauthorized to update this enrollment")
-     *         )
-     *     )
-     * )
-     */
-    public function complete(int $id)
-    {
-        $enrollment = $this->enrollmentRepository->complete($id, auth()->id());
-
-        if (!$enrollment) {
-            return response()->json([
-                'success' => false,
-                'message' => "Enrollment not found or unauthorized"
-            ], 404);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => "Enrollment marked as completed",
-            'data' => new EnrollmentResource($enrollment)
-        ]);
     }
 
     /**
@@ -423,20 +201,30 @@ class EnrollmentController extends Controller
      *     )
      * )
      */
-    public function destroy(int $id)
+    public function destroy(int $id): JsonResponse
     {
-        $deleted = $this->enrollmentRepository->cancel($id, auth()->id());
+        $deleted = $this->enrollmentRepository->cancelEnroll($id);
 
         if (!$deleted) {
-            return response()->json([
-                'success' => false,
-                'message' => "Enrollment not found or unauthorized"
-            ], 404);
+            return $this->notFoundResponse("Enrollment not found");
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => "Enrollment cancelled successfully"
-        ]);
+        return $this->successResponse("Enroll cancelled successfully");
+    }
+
+    /**
+     * Get user enrollments
+     */
+    public function myEnrollments(): JsonResponse
+    {
+        try {
+            $user = auth()->user();
+            $enrollments = $this->enrollmentRepository->getEnrollmentByUser($user->id);
+
+            return $this->successResponse("Enrollments getted successfully", new EnrollmentCollection($enrollments));
+        } catch(\Exception $e) {
+            \Log::error("Error getting enrollments: " . $e->getMessage());
+            return $this->errorResponse("Error getting enrollments", null, 500);
+        }
     }
 }

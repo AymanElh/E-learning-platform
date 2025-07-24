@@ -3,7 +3,9 @@
 namespace App\Repositories\Course;
 
 use App\Interfaces\Course\EnrollmentRepositoryInterface;
+use App\Models\Course;
 use App\Models\Enrollment;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 
 class EnrollmentRepository implements EnrollmentRepositoryInterface
@@ -15,20 +17,21 @@ class EnrollmentRepository implements EnrollmentRepositoryInterface
         if ($alreadyEnrolled) {
             return false;
         }
-
-        return Enrollment::create([
+        $enrollment  = Enrollment::create([
             'user_id' => $userId,
             'course_id' => $course->id,
             'status' => "pending"
         ]);
+
+        return $enrollment->load(['user', 'course']);
     }
 
-    public function getEnrollmentByCourse(int $courseId)
+    public function getEnrollmentByCourse(Course $course): Collection
     {
-        return Enrollment::where('course_id', $courseId)->with(['user', 'course'])->get();
+        return $course->enrollments()->with(['user', 'course'])->get();
     }
 
-    public function getEnrollmentByUser(int $userId)
+    public function getEnrollmentByUser(int $userId): Collection
     {
         return Enrollment::where('user_id', $userId)->with(['user', 'course'])->get();
     }
@@ -38,18 +41,13 @@ class EnrollmentRepository implements EnrollmentRepositoryInterface
         return Enrollment::with(['user', 'course'])->find($id);
     }
 
-    public function updateStatus(int $id, string $status)
+    public function updateStatus(Course $course, int $enrollmentId, string $status): bool
     {
-        $enrollment = Enrollment::find($id);
-        if (!$enrollment) {
-            return null;
-        }
-
-        $enrollment->update(['status' => $status]);
-        return $enrollment->refresh();
+        $enrollment = $course->enrollments()->findOrFail($enrollmentId);
+        return $enrollment->update(['status' => $status]);
     }
 
-    public function delete(int $id)
+    public function cancelEnroll(int $id)
     {
         $enrollment = Enrollment::find($id);
         if (!$enrollment) {

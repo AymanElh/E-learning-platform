@@ -18,7 +18,8 @@ class EnrollmentResource extends JsonResource
         return [
             'id' => $this->id,
             'course' => new CourseResource($this->whenLoaded('course')),
-            'user' => new UserResource($this->whenLoaded('user'))
+            'user' => new UserResource($this->whenLoaded('user')),
+            'status' => $this->status,
         ];
     }
 }

@@ -10,6 +10,7 @@ class Enrollment extends Model
      * @var string[]
      */
     protected $fillable = ['user_id', 'course_id', 'status'];
+    protected $with = ['user', 'course'];
 
     /**
      * Get the user that enrolled a course

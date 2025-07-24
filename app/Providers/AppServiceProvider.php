@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Exceptions\Handler;
 use App\Interfaces\Admin\PermissionRepositoryInterface;
 use App\Interfaces\Admin\RoleRepositoryInterface;
 use App\Interfaces\Auth\AuthRepositoryInterface;
@@ -20,6 +21,7 @@ use App\Repositories\Course\CourseRepository;
 use App\Repositories\Course\EnrollmentRepository;
 use App\Repositories\Course\SectionRepository;
 use App\Repositories\Course\LessonRepository;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Telescope\TelescopeServiceProvider;
