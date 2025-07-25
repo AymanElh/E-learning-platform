@@ -28,6 +28,11 @@ class Lesson extends Model
         return $this->belongsTo(Course::class);
     }
 
+    public function video(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Video::class);
+    }
+
     public function getCourseAttribute()
     {
         return $this->section->course;

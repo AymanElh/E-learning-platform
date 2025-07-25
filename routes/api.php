@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\Course\CourseController;
 use App\Http\Controllers\Api\V1\Course\EnrollmentController;
 use App\Http\Controllers\Api\V1\Course\LessonController;
 use App\Http\Controllers\Api\V1\Course\SectionController;
+use App\Http\Controllers\Api\V1\Course\VideoController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -63,6 +64,17 @@ Route::prefix('v1')->group(function() {
 
             // Lessons routes
             Route::apiResource('/sections/{sectionId}/lessons', LessonController::class);
+
+            // Video routes for lessons
+            Route::prefix('/sections/{section}/lessons/{lesson}')->group(function() {
+                Route::get('/video', [VideoController::class, 'show']);
+                Route::middleware('permission:create-courses')->post('/video', [VideoController::class, 'store']);
+                Route::middleware('permission:edit-courses')->put('/video', [VideoController::class, 'update']);
+                Route::middleware('permission:delete-courses')->delete('/video', [VideoController::class, 'destroy']);
+            });
+
+            // Get all videos in a course
+            Route::get('/videos', [VideoController::class, 'courseVideos']);
         });
 
         // Course tag management with permission checks

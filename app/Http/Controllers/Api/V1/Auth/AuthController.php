@@ -7,6 +7,7 @@ use App\Http\Requests\V1\Auth\LoginRequest;
 use App\Http\Requests\V1\Auth\RegisterRequest;
 use App\Http\Requests\V1\Auth\UpdateProfileRequest;
 use App\Repositories\Auth\AuthRepository;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 
 /**
@@ -17,6 +18,8 @@ use Illuminate\Http\Request;
  */
 class AuthController extends Controller
 {
+    use ApiResponse;
+
     protected AuthRepository $authRepository;
 
     /**
@@ -84,7 +87,7 @@ class AuthController extends Controller
     {
         try {
             $user = $this->authRepository->register($request->validated());
-            if(!$user) {
+            if (!$user) {
                 return response()->json([
                     'success' => false,
                     'message' => "Registration failed"
@@ -96,14 +99,14 @@ class AuthController extends Controller
                 'password' => $request->password
             ]);
 
-            if(!$token) {
+            if (!$token) {
                 return response()->json([
                     'success' => false,
                     'message' => "Registration successful but auto-login failed"
                 ], 500);
             }
-
-            return $this->createNewToken($token);
+            $tokenInfos = $this->createNewToken($token);
+            return $this->successResponse("User registered successfully", ['user' => $user, 'token' => $tokenInfos], 201);
         } catch (\Exception $e) {
             \Log::error("Registration failed: " . $e->getMessage());
             return response()->json([
@@ -156,15 +159,17 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request): \Illuminate\Http\JsonResponse
     {
-        $token = $this->authRepository->login($request->all());
-        if(!$token) {
-            return response()->json([
-                'success' => false,
-                'message' => "Login Failed"
-            ], 401);
+        try {
+            $token = $this->authRepository->login($request->all());
+            if (!$token) {
+                return $this->errorResponse("Login failed", null, 401);
+            }
+            $tokenInfos = $this->createNewToken($token);
+            return $this->successResponse("Login successfully", ['token' => $tokenInfos]);
+        } catch (\Exception $e) {
+            \Log::error("Login failed: " . $e->getMessage());
+            return $this->errorResponse("Login failed", null, 500);
         }
-
-        return $this->createNewToken($token);
     }
 
     /**
@@ -244,7 +249,7 @@ class AuthController extends Controller
     public function logout()
     {
         $success = $this->authRepository->logout();
-        if(!$success) {
+        if (!$success) {
             return response()->json([
                 'success' => false,
                 'message' => "Failed to logout"
@@ -295,13 +300,13 @@ class AuthController extends Controller
         }
     }
 
-    public function createNewToken($token)
+    public function createNewToken($token): array
     {
-        return response()->json([
+        return [
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60
-        ]);
+        ];
     }
 
     /**
@@ -403,7 +408,7 @@ class AuthController extends Controller
     public function uploadProfilePicture(Request $request)
     {
         $user = $this->authRepository->getAuthenticatedUser();
-        if(!$user) {
+        if (!$user) {
             return response()->json([
                 'success' => false,
                 'message' => "Unauthorized"
@@ -488,7 +493,7 @@ class AuthController extends Controller
                 'message' => "Profile updated successfully",
                 'user' => $user
             ]);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()
