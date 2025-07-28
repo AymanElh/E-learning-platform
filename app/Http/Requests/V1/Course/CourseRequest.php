@@ -33,7 +33,7 @@ class CourseRequest extends FormRequest
             'is_published' => 'nullable|boolean',
             'is_featured' => 'nullable|boolean',
             'thumbnail_url' => 'nullable|string|max:255|url',
-            'instructor_id' => 'required|exists:users,id',
+            'instructor_id' => 'nullable|exists:users,id',
             'category_id' => 'required|exists:categories,id',
             'subcategory_id' => 'nullable|exists:categories,id',
             'published_at' => 'nullable|date',

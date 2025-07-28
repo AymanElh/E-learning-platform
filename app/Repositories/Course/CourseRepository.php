@@ -16,7 +16,7 @@ class CourseRepository implements CourseRepositoryInterface
      */
     public function getAll(): \Illuminate\Database\Eloquent\Collection
     {
-        return Course::with(['sections', 'lessons', 'category', 'tags'])->get();
+        return Course::with(['instructor', 'sections', 'lessons', 'category', 'tags'])->get();
     }
 
     /**
@@ -27,7 +27,7 @@ class CourseRepository implements CourseRepositoryInterface
      */
     public function getById(int $id): ?Course
     {
-        return Course::with(['category', 'tags', 'sections.lessons'])->find($id);
+        return Course::with(['instructor', 'category', 'tags', 'sections.lessons'])->find($id);
     }
 
     /**
@@ -49,7 +49,7 @@ class CourseRepository implements CourseRepositoryInterface
             'is_free' => $data['is_free'],
             'is_featured' => $data['is_featured'],
             'thumbnail_url' => $data['thumbnail_url'] ?? null,
-            'instructor_id' => $data['instructor_id'],
+            'instructor_id' => $data['instructor_id'] ?? auth()->id(),
             'category_id' => $data['category_id'] ?? null,
             'subcategory_id' => $data['subcategory_id'] ?? null,
             'published_at' => now(),
@@ -60,7 +60,7 @@ class CourseRepository implements CourseRepositoryInterface
             $course->tags()->sync($data['tags']);
         }
 
-        return $course->load(['category', 'tags']);
+        return $course->load(['instructor', 'category', 'tags']);
     }
 
     /**
@@ -109,7 +109,7 @@ class CourseRepository implements CourseRepositoryInterface
             $course->tags()->sync($data['tags']);
         }
 
-        return $course->load(['category', 'tags']);
+        return $course->load(['instructor', 'category', 'tags']);
     }
 
     /**
@@ -139,7 +139,7 @@ class CourseRepository implements CourseRepositoryInterface
 
         $course->tags()->attach($tagIds);
 
-        return $course->load(['category', 'tags']);
+        return $course->load(['instructor', 'category', 'tags']);
     }
 
     public function syncTags(int $id, array $tagIds)
@@ -153,7 +153,7 @@ class CourseRepository implements CourseRepositoryInterface
         // The sync method will replace all existing relationships
         $course->tags()->sync($tagIds);
 
-        return $course->load(['category', 'tags']);
+         return $course->load(['instructor', 'category', 'tags']);
     }
 
     public function detachTags(int $id, array $tagIds)
@@ -171,6 +171,6 @@ class CourseRepository implements CourseRepositoryInterface
                 ->delete();
         }
 
-        return $course->load(['category', 'tags']);
+        return $course->load(['instructor', 'category', 'tags']);
     }
 }
