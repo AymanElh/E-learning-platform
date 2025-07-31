@@ -22,7 +22,7 @@ class CategoryRepository implements CategoryRepositoryInterface
      */
     public function index(): \Illuminate\Database\Eloquent\Collection
     {
-        return Category::all();
+        return Category::with('children')->get();
     }
 
     /**

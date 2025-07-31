@@ -3,6 +3,7 @@
 namespace App\Http\Requests\V1\Course;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CourseRequest extends FormRequest
 {
@@ -21,10 +22,34 @@ class CourseRequest extends FormRequest
      */
     public function rules(): array
     {
+        // debugging
+        $routeParam = $this->route('course');
+        \Log::info("Route parameter: ", ['param' => $routeParam]);
+
+        $courseId = null;
+
+        if(is_object($routeParam)) {
+            $courseId = $routeParam->id;
+            \Log::info("Object");
+        } else if(is_numeric($routeParam)) {
+            $courseId = $routeParam;
+            \Log::info("numeric");
+        } else {
+            $courseId = $this->route()->parameter('course');
+        }
+
+        \Log::info("Course ID for validation: ", ['id' => $courseId]);
+
+//        $courseId = $this->route('course') ? $this->route('course')->id ?? $this->route('course') : null;
         return [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'slug' => 'sometimes|string|max:255|unique:courses,slug,' . $this->route('course'),
+            'slug' => [
+                'sometimes',
+                'string',
+                'max:255',
+                Rule::unique('courses', 'slug')->ignore($courseId)
+            ],
             'duration' => 'nullable|integer|min:1',
             'difficulty' => 'required|in:beginner,intermediate,advanced',
             'status' => 'nullable|in:open,closed',
