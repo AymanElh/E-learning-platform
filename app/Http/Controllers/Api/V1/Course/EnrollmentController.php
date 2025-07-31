@@ -34,6 +34,11 @@ class EnrollmentController extends Controller
         $this->enrollmentRepository = $enrollmentRepository;
     }
 
+    public function index(): JsonResponse
+    {
+        return $this->successResponse("Enrollments retrieved successfully", $this->enrollmentRepository->getAllEnrollments());
+    }
+
     /**
      * @OA\Post(
      *     path="/api/v1/courses/{courseId}/enroll",

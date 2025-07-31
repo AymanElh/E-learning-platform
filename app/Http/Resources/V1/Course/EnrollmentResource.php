@@ -20,6 +20,7 @@ class EnrollmentResource extends JsonResource
             'course' => new CourseResource($this->whenLoaded('course')),
             'user' => new UserResource($this->whenLoaded('user')),
             'status' => $this->status,
+            'createdAt' => $this->created_at
         ];
     }
 }

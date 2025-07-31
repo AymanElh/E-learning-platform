@@ -10,6 +10,11 @@ use Illuminate\Http\JsonResponse;
 
 class EnrollmentRepository implements EnrollmentRepositoryInterface
 {
+    public function getAllEnrollments(): Collection
+    {
+        return Enrollment::all();
+    }
+
     public function enroll(\App\Models\Course $course, int $userId): Enrollment|false|null
     {
         $alreadyEnrolled = $course->enrollments()->where('user_id', $userId)->exists();

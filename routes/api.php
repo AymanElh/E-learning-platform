@@ -90,6 +90,7 @@ Route::prefix('v1')->group(function() {
             Route::patch('/enrollments/{enrollment}', [EnrollmentController::class, 'updateStatus'])->middleware('role:admin|instructor');
             Route::get('/enrollments', [EnrollmentController::class, 'getEnrollmentsByCourse'])->middleware('role:instructor');
         });
+        Route::get('/enrollments', [EnrollmentController::class, 'index']);
         Route::get('/enrollments/me', [EnrollmentController::class, 'myEnrollments']);
         Route::delete('/enrollments/{enrollment}', [EnrollmentController::class, 'destroy']);
 
