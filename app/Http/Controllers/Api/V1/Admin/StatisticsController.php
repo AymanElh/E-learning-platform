@@ -98,7 +98,7 @@ class StatisticsController extends Controller
      *     )
      * )
      */
-    public function getCourseStats()
+    public function getCourseStats(): \Illuminate\Http\JsonResponse
     {
         try {
             $totalCourses = Course::count();
@@ -135,7 +135,7 @@ class StatisticsController extends Controller
                 ->get(['id', 'title', 'created_at']);
 
             return response()->json([
-                'succcess' => true,
+                'success' => true,
                 'data' => [
                     'total' => $totalCourses,
                     'by_status' => $courseByStatus,
@@ -211,7 +211,7 @@ class StatisticsController extends Controller
      *     )
      * )
      */
-    public function getCategoryStats()
+    public function getCategoryStats(): \Illuminate\Http\JsonResponse
     {
         try {
             $totalCategories = Category::count();
@@ -297,7 +297,7 @@ class StatisticsController extends Controller
      *     )
      * )
      */
-    public function getTagsStats()
+    public function getTagsStats(): \Illuminate\Http\JsonResponse
     {
         try {
             $totalTags = Tag::count();

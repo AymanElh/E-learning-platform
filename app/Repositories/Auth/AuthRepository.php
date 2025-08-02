@@ -59,7 +59,9 @@ class AuthRepository implements AuthRepositoryInterface
                 $user->load('roles', 'permissions');
                 $user->role_names = $user->getRoleNames();
                 $user->permission_names = $user->getAllPermissions()->pluck('name');
+                return $user;
             }
+            return null;
         } catch (Exception $e) {
             return null;
         }

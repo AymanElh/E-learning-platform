@@ -88,7 +88,7 @@ Route::prefix('v1')->group(function() {
         Route::prefix('/courses/{course}')->group(function() {
             Route::post('/enroll', [EnrollmentController::class, 'enroll']);
             Route::patch('/enrollments/{enrollment}', [EnrollmentController::class, 'updateStatus'])->middleware('role:admin|instructor');
-            Route::get('/enrollments', [EnrollmentController::class, 'getEnrollmentsByCourse'])->middleware('role:instructor');
+            Route::get('/enrollments', [EnrollmentController::class, 'getEnrollmentsByCourse'])->middleware('role:instructor|admin');
         });
         Route::get('/enrollments', [EnrollmentController::class, 'index']);
         Route::get('/enrollments/me', [EnrollmentController::class, 'myEnrollments']);
@@ -96,14 +96,14 @@ Route::prefix('v1')->group(function() {
 
 
         // Statistics routes with permission checks
-        Route::middleware('permission:view statistics')->prefix('stats')->group(function () {
+        Route::middleware('permission:view-statistics')->prefix('stats')->group(function () {
             Route::get('/categories', [StatisticsController::class, 'getCategoryStats']);
             Route::get('/tags', [StatisticsController::class, 'getTagStats']);
             Route::get('/courses', [StatisticsController::class, 'getCourseStats']);
         });
 
         // Roles & Permissions management (admin only)
-        Route::middleware('permission:manage roles')->group(function () {
+        Route::middleware('permission:manage-roles')->group(function () {
             Route::apiResource('/roles', RoleController::class);
             Route::post('/roles/{role}/permissions', [RoleController::class, 'assignPermissions']);
             Route::delete('/roles/{role}/permissions', [RoleController::class, 'removePermissions']);

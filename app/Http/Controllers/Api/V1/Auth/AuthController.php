@@ -8,6 +8,7 @@ use App\Http\Requests\V1\Auth\RegisterRequest;
 use App\Http\Requests\V1\Auth\UpdateProfileRequest;
 use App\Repositories\Auth\AuthRepository;
 use App\Traits\ApiResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
@@ -165,7 +166,7 @@ class AuthController extends Controller
                 return $this->errorResponse("Login failed", null, 401);
             }
             $tokenInfos = $this->createNewToken($token);
-            return $this->successResponse("Login successfully", ['token' => $tokenInfos]);
+            return $this->successResponse("Login successfully", ['token' => $tokenInfos, 'user' => $this->authRepository->getAuthenticatedUser()]);
         } catch (\Exception $e) {
             \Log::error("Login failed: " . $e->getMessage());
             return $this->errorResponse("Login failed", null, 500);
@@ -205,7 +206,7 @@ class AuthController extends Controller
      *     )
      * )
      */
-    public function user()
+    public function user(): JsonResponse
     {
         $user = $this->authRepository->getAuthenticatedUser();
         return response()->json([
@@ -246,7 +247,7 @@ class AuthController extends Controller
      *     )
      * )
      */
-    public function logout()
+    public function logout(): JsonResponse
     {
         $success = $this->authRepository->logout();
         if (!$success) {
