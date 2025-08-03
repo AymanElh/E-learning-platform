@@ -24,6 +24,9 @@ Route::prefix('v1')->group(function() {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/refresh', [AuthController::class, 'refresh']);
 
+    // User courses (open courses only)
+    Route::get('/courses/open', [CourseController::class, 'getOpenCourses']);
+
     // Routes that require authentication
     Route::middleware('auth:api')->group(function() {
 

@@ -4,6 +4,7 @@ namespace App\Repositories\Course;
 
 use App\Interfaces\Course\CourseRepositoryInterface;
 use App\Models\Course;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
@@ -173,4 +174,11 @@ class CourseRepository implements CourseRepositoryInterface
 
         return $course->load(['instructor', 'category', 'tags']);
     }
+
+    public function getOpenCourses(): Collection
+    {
+        return Course::with(['category', 'tags', 'instructor', 'sections', 'lessons'])->where('status', 'open')->get();
+    }
+
+
 }

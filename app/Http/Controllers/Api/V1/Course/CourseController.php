@@ -9,6 +9,7 @@ use App\Http\Requests\V1\Course\CourseRequest;
 use App\Http\Resources\V1\Course\CourseCollection;
 use App\Http\Resources\V1\Course\CourseResource;
 use App\Repositories\Course\CourseRepository;
+use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Log;
  */
 class CourseController extends Controller
 {
+    use ApiResponse;
     public CourseRepository $courseRepository;
 
     public function __construct(CourseRepository $courseRepository)
@@ -744,5 +746,16 @@ class CourseController extends Controller
             'message' => 'Tags detached successfully',
             'data' => new CourseResource($course)
         ]);
+    }
+
+    public function getOpenCourses(): JsonResponse
+    {
+        try {
+            $courses = $this->courseRepository->getOpenCourses();
+            return $this->successResponse("Open courses got successfully", $courses);
+        } catch (\Exception $e) {
+            \Log::error("Error got courses: " . $e->getMessage());
+            return $this->errorResponse("Error got open courses", null, 500);
+        }
     }
 }

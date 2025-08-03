@@ -2,6 +2,8 @@
 
 namespace App\Interfaces\Course;
 
+use Illuminate\Database\Eloquent\Collection;
+
 interface CourseRepositoryInterface
 {
     public function getAll();
@@ -12,4 +14,5 @@ interface CourseRepositoryInterface
     public function attachTags(int $id, array $tagIds);
     public function syncTags(int $id, array $tagIds);
     public function detachTags(int $id, array $tagIds);
+    public function getOpenCourses(): Collection;
 }
