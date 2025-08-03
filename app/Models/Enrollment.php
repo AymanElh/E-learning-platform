@@ -9,8 +9,12 @@ class Enrollment extends Model
     /**
      * @var string[]
      */
-    protected $fillable = ['user_id', 'course_id', 'status'];
+    protected $fillable = ['user_id', 'course_id', 'status', 'progress', 'order_id', 'enrolled_at', 'completed_at'];
     protected $with = ['user', 'course'];
+
+    protected $casts = [
+        'enrolled_at' => 'datetime'
+    ];
 
     /**
      * Get the user that enrolled a course

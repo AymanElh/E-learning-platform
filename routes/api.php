@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\Course\EnrollmentController;
 use App\Http\Controllers\Api\V1\Course\LessonController;
 use App\Http\Controllers\Api\V1\Course\SectionController;
 use App\Http\Controllers\Api\V1\Course\VideoController;
+use App\Http\Controllers\Api\V1\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -112,6 +113,13 @@ Route::prefix('v1')->group(function() {
             Route::delete('/roles/{role}/permissions', [RoleController::class, 'removePermissions']);
 
             Route::apiResource('/permissions', PermissionController::class);
+        });
+
+        // payments routes
+        Route::prefix('/payments')->group(function() {
+            Route::post('/create-intent', [PaymentController::class, 'createPaymentIntent']);
+            Route::post('/confirm', [PaymentController::class, 'confirmPayment']);
+            Route::post('/test-confirm', [PaymentController::class, 'testConfirmationPayment']);
         });
     });
 });

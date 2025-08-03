@@ -29,7 +29,7 @@ trait ApiResponse
     /**
      * Error response
      */
-    protected function errorResponse(string $message = null, array|object $data = null, int $statusCode = 400): JsonResponse
+    protected function errorResponse(string $message = null, array|object $errors = null, int $statusCode = 400): JsonResponse
     {
         $response = [
             'success' => false,
@@ -39,8 +39,8 @@ trait ApiResponse
             $response['message'] = $message;
         }
 
-        if($data != null) {
-            $response['data'] = $data;
+        if($errors != null) {
+            $response['errors'] = $errors;
         }
 
         return response()->json($response, $statusCode);
