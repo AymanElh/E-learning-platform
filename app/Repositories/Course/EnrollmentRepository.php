@@ -61,4 +61,8 @@ class EnrollmentRepository implements EnrollmentRepositoryInterface
         return $enrollment->delete();
     }
 
+    public function getEnrollmentStatus(int $courseId, int $userId): bool
+    {
+        return Enrollment::where('user_id', $userId)->where('course_id', $courseId)->exists();
+    }
 }

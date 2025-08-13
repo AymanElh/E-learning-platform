@@ -342,9 +342,9 @@ class AuthController extends Controller
      *     )
      * )
      */
-    public function profile()
+    public function profile(): JsonResponse
     {
-        return response()->json(['user' => auth()->user()]);
+        return response()->json(['success' => true, 'user' => auth()->user()]);
     }
 
     /**

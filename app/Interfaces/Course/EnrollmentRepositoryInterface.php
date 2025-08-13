@@ -14,4 +14,5 @@ interface EnrollmentRepositoryInterface
     public function getById(int $id);
     public function updateStatus(Course $course, int $enrollmentId, string $status);
     public function cancelEnroll(int $id);
+    public function getEnrollmentStatus(int $courseId, int $userId);
 }

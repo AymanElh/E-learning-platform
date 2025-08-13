@@ -57,6 +57,7 @@ Route::prefix('v1')->group(function() {
         Route::middleware('permission:create-courses')->post('/courses', [CourseController::class, 'store']);
         Route::middleware('permission:edit-courses')->put('/courses/{course}', [CourseController::class, 'update']);
         Route::middleware('permission:delete-courses')->delete('/courses/{course}', [CourseController::class, 'destroy']);
+        Route::get('/courses/{courseId}/enrollment-status', [EnrollmentController::class, 'isExistEnrollment']);
 
         // Course Sections
         Route::prefix('/courses/{course}')->group(function() {

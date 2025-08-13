@@ -8,10 +8,12 @@ use App\Http\Resources\V1\Course\EnrollmentCollection;
 use App\Http\Resources\V1\Course\EnrollmentResource;
 use App\Interfaces\Course\EnrollmentRepositoryInterface;
 use App\Models\Course;
+use App\Models\Enrollment;
 use App\Traits\ApiResponse;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -230,6 +232,20 @@ class EnrollmentController extends Controller
         } catch(\Exception $e) {
             \Log::error("Error getting enrollments: " . $e->getMessage());
             return $this->errorResponse("Error getting enrollments", null, 500);
+        }
+    }
+
+    public function isExistEnrollment(int $courseId): JsonResponse
+    {
+        try {
+            $userId = Auth::id();
+
+            $isEnrolled = $this->enrollmentRepository->getEnrollmentStatus($courseId, $userId);
+
+            return $this->successResponse("Enrollment exist for this user", ['isEnrolled' => $isEnrolled]);
+        } catch (\Exception $e) {
+            \Log::error("Error: " . $e->getMessage());
+            return $this->errorResponse("Error");
         }
     }
 }
