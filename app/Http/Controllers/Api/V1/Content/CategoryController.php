@@ -8,6 +8,7 @@ use App\Http\Resources\V1\Content\CategoryCollection;
 use App\Http\Resources\V1\Content\CategoryResource;
 use App\Interfaces\Content\CategoryRepositoryInterface;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
 
 /**
  * @OA\Tag(
@@ -372,7 +373,54 @@ class CategoryController extends Controller
         }
     }
 
-    public function children(int $id)
+    /**
+     * Get public categories (for non-authenticated users)
+     */
+    public function indexPublic()
+    {
+        try {
+            $categories = $this->categoryRepository->getPublicCategories();
+            return response()->json([
+                'success' => true,
+                'message' => 'Public categories retrieved successfully',
+                'data' => new CategoryCollection($categories)
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve categories'
+            ], 500);
+        }
+    }
+
+    /**
+     * Show public category details (for non-authenticated users)
+     */
+    public function showPublic($id)
+    {
+        try {
+            $category = $this->categoryRepository->getPublicCategoryById($id);
+            if (!$category) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Category not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Category retrieved successfully',
+                'data' => new CategoryResource($category)
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve category'
+            ], 500);
+        }
+    }
+
+    public function children(int $id): JsonResponse
     {
         try {
             $children = new CategoryCollection($this->categoryRepository->getChildren($id));

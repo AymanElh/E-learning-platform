@@ -748,6 +748,58 @@ class CourseController extends Controller
         ]);
     }
 
+    /**
+     * Get public courses (only published/open courses)
+     * No authentication required
+     */
+    public function getPublicCourses(): JsonResponse
+    {
+        try {
+            $courses = new CourseCollection($this->courseRepository->getPublicCourses());
+
+            return response()->json([
+                'success' => true,
+                'message' => "Public courses retrieved successfully",
+                'data' => $courses
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error fetching public courses: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => "Failed to retrieve public courses"
+            ], 500);
+        }
+    }
+
+    /**
+     * Show public course details
+     * No authentication required
+     */
+    public function showPublic(int $id): JsonResponse
+    {
+        try {
+            $course = $this->courseRepository->getPublicCourseById($id);
+            if (!$course) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Course not found or not available for public viewing"
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Course retrieved successfully",
+                'data' => new CourseResource($course)
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error fetching public course: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => "Failed to retrieve course"
+            ], 500);
+        }
+    }
+
     public function getOpenCourses(): JsonResponse
     {
         try {

@@ -180,5 +180,29 @@ class CourseRepository implements CourseRepositoryInterface
         return Course::with(['category', 'tags', 'instructor', 'sections', 'lessons'])->where('status', 'open')->get();
     }
 
+    /**
+     * Get public courses (only published and open courses)
+     * For non-authenticated users
+     */
+    public function getPublicCourses(): Collection
+    {
+        return Course::with(['category', 'tags', 'instructor'])
+            ->where('status', 'open')
+            ->where('is_published', true)
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
 
+    /**
+     * Get a specific public course by ID
+     * For non-authenticated users
+     */
+    public function getPublicCourseById(int $id): ?Course
+    {
+        return Course::with(['instructor', 'category', 'tags'])
+            ->where('id', $id)
+            ->where('status', 'open')
+            ->where('is_published', true)
+            ->first();
+    }
 }

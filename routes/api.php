@@ -25,8 +25,14 @@ Route::prefix('v1')->group(function() {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/refresh', [AuthController::class, 'refresh']);
 
-    // User courses (open courses only)
-    Route::get('/courses/open', [CourseController::class, 'getOpenCourses']);
+    // Public course routes (no authentication required)
+    Route::prefix('/public')->group(function() {
+        Route::get('/courses', [CourseController::class, 'getPublicCourses']); // Only open/published courses
+        Route::get('/courses/{course}', [CourseController::class, 'showPublic']); // Public course details
+        Route::get('/categories', [CategoryController::class, 'indexPublic']); // Public categories
+        Route::get('/categories/{category}', [CategoryController::class, 'showPublic']);
+        Route::get('/tags', [TagController::class, 'indexPublic']); // Public tags
+    });
 
     // Routes that require authentication
     Route::middleware('auth:api')->group(function() {
@@ -36,30 +42,35 @@ Route::prefix('v1')->group(function() {
         Route::put('/profile', [AuthController::class, 'updateProfile'])->name('update-profile');
         Route::post('/profile-picture', [AuthController::class, 'uploadProfilePicture']);
 
-        // Tag
-        Route::get('/tags', [TagController::class, 'index']);
-        Route::get('/tags/{tag}', [TagController::class, 'show']);
-        Route::middleware('permission:create-tags')->post('/tags', [TagController::class, 'store']);
-        Route::middleware('permission:edit-tags')->put('/tags/{tag}', [TagController::class, 'update']);
-        Route::middleware('permission:delete-tags')->delete('/tags/{tag}', [TagController::class, 'destroy']);
+        // Admin/Management routes for courses (requires authentication and permissions)
+        Route::prefix('admin')->group(function() {
+            // Tag management
+            Route::get('/tags', [TagController::class, 'index']);
+            Route::get('/tags/{tag}', [TagController::class, 'show']);
+            Route::middleware('permission:create-tags')->post('/tags', [TagController::class, 'store']);
+            Route::middleware('permission:edit-tags')->put('/tags/{tag}', [TagController::class, 'update']);
+            Route::middleware('permission:delete-tags')->delete('/tags/{tag}', [TagController::class, 'destroy']);
 
-        // Category
-        Route::get('/categories', [CategoryController::class, 'index']);
-        Route::get('/categories/{category}', [CategoryController::class, 'show']);
-        Route::middleware('permission:create-categories')->post('/categories', [CategoryController::class, 'store']);
-        Route::middleware('permission:edit-categories')->put('/categories/{category}', [CategoryController::class, 'update']);
-        Route::middleware('permission:delete-categories')->delete('/categories/{category}', [CategoryController::class, 'destroy']);
-        Route::get('/categories/{category}/children', [CategoryController::class, 'children']);
+            // Category management
+            Route::get('/categories', [CategoryController::class, 'index']);
+            Route::get('/categories/{category}', [CategoryController::class, 'show']);
+            Route::middleware('permission:create-categories')->post('/categories', [CategoryController::class, 'store']);
+            Route::middleware('permission:edit-categories')->put('/categories/{category}', [CategoryController::class, 'update']);
+            Route::middleware('permission:delete-categories')->delete('/categories/{category}', [CategoryController::class, 'destroy']);
+            Route::get('/categories/{category}/children', [CategoryController::class, 'children']);
 
-        // Course routes with permission checks
-        Route::get('/courses', [CourseController::class, 'index']);
-        Route::get('/courses/{course}', [CourseController::class, 'show']);
-        Route::middleware('permission:create-courses')->post('/courses', [CourseController::class, 'store']);
-        Route::middleware('permission:edit-courses')->put('/courses/{course}', [CourseController::class, 'update']);
-        Route::middleware('permission:delete-courses')->delete('/courses/{course}', [CourseController::class, 'destroy']);
+            // Course management (admin only)
+            Route::get('/courses', [CourseController::class, 'index']); // All courses for admin
+            Route::get('/courses/{course}', [CourseController::class, 'show']); // Course details for admin
+            Route::middleware('permission:create-courses')->post('/courses', [CourseController::class, 'store']);
+            Route::middleware('permission:edit-courses')->put('/courses/{course}', [CourseController::class, 'update']);
+            Route::middleware('permission:delete-courses')->delete('/courses/{course}', [CourseController::class, 'destroy']);
+        });
+
+        // User-specific course routes (authenticated users)
         Route::get('/courses/{courseId}/enrollment-status', [EnrollmentController::class, 'isExistEnrollment']);
 
-        // Course Sections
+        // Course Sections (requires authentication to access course content)
         Route::prefix('/courses/{course}')->group(function() {
             Route::get('/sections', [SectionController::class, 'index']);
             Route::post('/sections', [SectionController::class, 'store'])->middleware('permission:create-courses');

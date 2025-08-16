@@ -128,7 +128,7 @@ class EnrollmentController extends Controller
 
             return $this->successResponse("Course Enrolled successfully", new EnrollmentResource($enrollment), 201);
         } catch (\Exception $e) {
-            \Log::error("Error enrolling this course: ", $e->getMessage());
+            \Log::error("Error enrolling this course: " . $e->getMessage());
             return $this->errorResponse("Error enrolling this course", null, 500);
         }
     }
